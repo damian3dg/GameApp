@@ -45,7 +45,7 @@ fun DetailView(viewModel: GamesViewModel, navController: NavController, id: Int)
         }
     )
     {
-        //Supongo que poniendo it , automaticamente coloca el compose debajo d la topbar
+
         ContentDetailView(it, viewModel = viewModel)
     }
 }
