@@ -41,7 +41,8 @@ fun DetailView(viewModel: GamesViewModel, navController: NavController, id: Int)
         {
             MainTopBar(title = viewModel.state.name, showBackButton = true)
             {
-                navController.navigate("HomeView")
+
+                navController.popBackStack()
             }
         }
     )
