@@ -1,5 +1,6 @@
 package com.example.gameapp.view
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -39,15 +40,12 @@ fun DetailView(viewModel: GamesViewModel, navController: NavController, id: Int)
     Scaffold(
         topBar =
         {
-            MainTopBar(title = viewModel.state.name, showBackButton = true)
-            {
 
-                navController.popBackStack()
-            }
+            MainTopBar(title = viewModel.state.name, showBackButton = true) { navController.popBackStack() }
         }
     )
     {
-        //Supongo que poniendo it , automaticamente coloca el compose debajo de la topbar
+        //Supongo que poniendo it , automaticamente coloca el compose debajo d la topbar
         ContentDetailView(it, viewModel = viewModel)
     }
 }

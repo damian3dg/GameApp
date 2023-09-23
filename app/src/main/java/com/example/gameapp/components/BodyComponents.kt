@@ -47,7 +47,7 @@ fun MainTopBar(title: String, showBackButton: Boolean = false, onClickBackButton
         containerColor = Color(CUSTOM_BLACK)
     ), navigationIcon = {
         if (showBackButton) {
-            IconButton(onClick = { onClickBackButton }) {
+            IconButton(onClick =  onClickBackButton ) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "",
