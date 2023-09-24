@@ -24,6 +24,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.gameapp.components.MainImage
 import com.example.gameapp.components.MainTopBar
+import com.example.gameapp.components.MetaWebSite
+import com.example.gameapp.components.ReviewCard
 import com.example.gameapp.util.Constants.Companion.CUSTOM_BLACK
 import com.example.gameapp.viewModel.GamesViewModel
 
@@ -68,7 +70,9 @@ fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel) {
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 5.dp)
         ) {
-
+            
+            MetaWebSite(state.website)
+             ReviewCard(metascore = (state.metacritic))
 
         }
 
