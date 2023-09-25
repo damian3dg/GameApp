@@ -39,6 +39,7 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
+import com.example.gameapp.R
 import com.example.gameapp.model.GameList
 import com.example.gameapp.util.Constants.Companion.CUSTOM_BLACK
 import com.example.gameapp.util.Constants.Companion.CUSTOM_GREEN
@@ -95,7 +96,7 @@ fun MainImage(image: String) {
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
             .data(image)
-            .crossfade(true)
+            .crossfade(1000)
             .build(),
         contentDescription = "default crossfade example",
         modifier = Modifier
