@@ -1,30 +1,35 @@
 package com.example.gameapp.view
 
-import android.util.Log
-import android.widget.Toast
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.gameapp.components.MainImage
 import com.example.gameapp.components.MainTopBar
@@ -43,7 +48,7 @@ fun DetailView(viewModel: GamesViewModel, navController: NavController, id: Int)
         viewModel.getGameById(id)
     }
 
-    DisposableEffect(Unit){
+    DisposableEffect(Unit) {
         onDispose {
             viewModel.clean()
         }
@@ -61,7 +66,29 @@ fun DetailView(viewModel: GamesViewModel, navController: NavController, id: Int)
     )
     {
 
-        ContentDetailView(it, viewModel = viewModel)
+        val state = viewModel.state
+        val isLoading by viewModel.isLoading.collectAsState()
+
+        if (isLoading) {
+            // Muestra el ProgressBar mientras se carga
+
+
+
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .wrapContentSize(Alignment.Center),
+                    color = Color.White
+
+
+                )
+
+
+
+        } else {
+
+            ContentDetailView(it, viewModel = viewModel)
+        }
     }
 }
 
@@ -97,7 +124,7 @@ fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel) {
                 .verticalScroll(scroll),
 
 
-        )
+            )
 
     }
 }
