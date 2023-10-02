@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.gameapp.R
 import com.example.gameapp.model.GameList
@@ -46,12 +48,12 @@ import com.example.gameapp.util.Constants.Companion.CUSTOM_GREEN
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainTopBar(title: String, showBackButton: Boolean = false, onClickBackButton: () -> Unit) {
+fun MainTopBar(title: String, showBackButton: Boolean = false, onClickBackButton: () -> Unit, onClickAction: () -> Unit){
 
     //Creamos un topBar generico, no se por que no se usa el scaffold , investigar
     TopAppBar(title = {
         Text(
-            text = title, color = Color.White, fontWeight = FontWeight.ExtraBold
+            text = title, color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp
         )
     }, colors = TopAppBarDefaults.mediumTopAppBarColors(
         containerColor = Color(CUSTOM_BLACK)
@@ -65,14 +67,29 @@ fun MainTopBar(title: String, showBackButton: Boolean = false, onClickBackButton
                 )
             }
         }
-    })
+    },
+        actions = {
+            if (!showBackButton) {
+                IconButton(onClick = onClickAction) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "",
+                        tint = Color.White
+                    )
+                }
+            }
+
+        }
+
+    )
 
 }
 
 @Composable
 fun CardGame(game: GameList, onClick: () -> Unit) {
+
     Card(
-        shape = RoundedCornerShape(5.dp),
+        shape = RoundedCornerShape(15.dp),
         modifier = Modifier
             .padding(10.dp)
             .shadow(40.dp)
@@ -90,22 +107,30 @@ fun CardGame(game: GameList, onClick: () -> Unit) {
 @Composable
 fun MainImage(image: String) {
 
-    val painter = rememberAsyncImagePainter(image)
+    val imagenModificada = image.replace("/media/", "/media/crop/600/400/")
+    val painter = rememberAsyncImagePainter(imagenModificada)
     val state = painter.state
 
+
     AsyncImage(
+
         model = ImageRequest.Builder(LocalContext.current)
-            .data(image)
-            .crossfade(1000)
+            .data(imagenModificada)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .crossfade(true)
+
             .build(),
-        contentDescription = "default crossfade example",
+        contentDescription = "",
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .height(250.dp),
         contentScale = ContentScale.Crop
 
 
     )
+
+
 
 
 //    Image(
@@ -174,3 +199,4 @@ fun ReviewCard(metascore: Int) {
     }
 
 }
+

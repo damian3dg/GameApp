@@ -1,12 +1,16 @@
 package com.example.gameapp.viewModel
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gameapp.model.GameList
+import com.example.gameapp.model.GameModelFree
+import com.example.gameapp.model.GamesModel
+import com.example.gameapp.model.ScreenShot
 import com.example.gameapp.repository.GamesRepository
 import com.example.gameapp.state.GameState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +29,12 @@ class GamesViewModel @Inject constructor(private val repo: GamesRepository) : Vi
     private val _games = MutableStateFlow<List<GameList>>(emptyList())
     val games = _games.asStateFlow()
 
+    private val _gamesFree = MutableStateFlow<List<GameModelFree>>(emptyList())
+    val gamesFree = _gamesFree.asStateFlow()
+
+    private val _screenshots = MutableStateFlow<List<ScreenShot>>(emptyList())
+    val screenshots = _screenshots.asStateFlow()
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     var state by mutableStateOf(GameState())
@@ -40,8 +50,54 @@ class GamesViewModel @Inject constructor(private val repo: GamesRepository) : Vi
             withContext(Dispatchers.IO) {
                 //Aca ejecutamos la funcion que esta dentro del repository sin instanciarla ya que esta inyectada
                 val result = repo.getGames()
+
                 //En caso de que no venga nada le ponemos una emptyList
                 _games.value = result ?: emptyList()
+
+            }
+
+        }
+    }
+
+
+    private fun fetchFeeGames() {
+
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                //Aca ejecutamos la funcion que esta dentro del repository sin instanciarla ya que esta inyectada
+                val result = repo.getGamesFree()
+
+                //En caso de que no venga nada le ponemos una emptyList
+                _gamesFree.value = result ?: emptyList()
+
+            }
+
+        }
+    }
+
+     fun fetchSearchGames(name:String) {
+         _isLoading.value = true
+        viewModelScope.launch {
+
+            withContext(Dispatchers.IO) {
+                try {
+                    val result = repo.getSearchGames(reemplazarEspaciosConGuionesBajos(name))
+
+                    _games.value = result ?: emptyList()
+
+
+
+                } catch (e: Exception) {
+                    // Manejar errores si es necesario
+                } finally {
+                    // Indicar que la carga ha terminado, ya sea con éxito o error
+                    _isLoading.value = false
+                }
+
+
+
+
+
             }
 
         }
@@ -50,6 +106,7 @@ class GamesViewModel @Inject constructor(private val repo: GamesRepository) : Vi
 @SuppressLint("SuspiciousIndentation")
 fun getGameById(id:Int){
     _isLoading.value = true
+//    fetchScreenshotsForGame(id.toString())
         viewModelScope.launch {
             withContext(Dispatchers.IO){
 
@@ -74,6 +131,23 @@ fun getGameById(id:Int){
         }
     }
 
+
+
+
+
+
+        fun fetchScreenshotsForGame(gamePk: String) {
+            _isLoading.value = true
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+            val screenshotsList = repo.getScreenshotsForGame(gamePk)
+            if (screenshotsList != null) {
+                _screenshots.value = screenshotsList
+            }
+        }
+                }
+            }
+
     fun clean(){
         state = state.copy(
             name =  "",
@@ -84,4 +158,9 @@ fun getGameById(id:Int){
 
         )
     }
+
+    fun reemplazarEspaciosConGuionesBajos(texto: String): String {
+        return texto.replace(" ", "-")
+    }
+
 }

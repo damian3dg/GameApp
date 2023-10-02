@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.gameapp.view.DetailView
 import com.example.gameapp.view.HomeView
+import com.example.gameapp.view.SearchGameView
 import com.example.gameapp.viewModel.GamesViewModel
 
 @Composable
@@ -17,13 +18,13 @@ fun NavManager(viewModel: GamesViewModel) {
         composable("Home") {
             HomeView(viewModel, navController)
         }
-        composable(
-            "DetailView/{id}", arguments = listOf(
-                navArgument( "id"){type = NavType.IntType}
-            )
-        ) {
+        composable("DetailView/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })) {
             val id = it.arguments?.getInt("id") ?: 0
             DetailView(viewModel, navController, id)
+        }
+        composable("SearchGameView"){
+            SearchGameView(viewModel,navController )
         }
     }
 }
