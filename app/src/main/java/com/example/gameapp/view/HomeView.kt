@@ -1,5 +1,6 @@
 package com.example.gameapp.view
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,11 +42,14 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.gameapp.components.CardGame
+import com.example.gameapp.components.Loader
 import com.example.gameapp.components.MainTopBar
 import com.example.gameapp.util.Constants.Companion.CUSTOM_BLACK
 import com.example.gameapp.viewModel.GamesViewModel
@@ -58,30 +63,27 @@ fun HomeView(viewModel: GamesViewModel, navController: NavController) {
 
         }
     }) {
-        ContentHomeView(viewModel, it,navController)
+        ContentHomeView(viewModel, it, navController)
         // ScreenshotsView("28026", viewModel)
     }
 }
 
 @Composable
-fun ContentHomeView(viewModel: GamesViewModel, pad: PaddingValues,navController: NavController) {
+fun ContentHomeView(viewModel: GamesViewModel, pad: PaddingValues, navController: NavController) {
     val games by viewModel.games.collectAsState()
-
+    val gamesPage = viewModel.gamesPage.collectAsLazyPagingItems()
     val gamesFree by viewModel.gamesFree.collectAsState()
 
     val isLoading by viewModel.isLoading.collectAsState()
 
-    if (isLoading) {
+    if (gamesPage.itemCount < 1 ) {
         // Muestra el ProgressBar mientras se carga
 
-        CircularProgressIndicator(
-            modifier = Modifier
-                .fillMaxSize()
-                .wrapContentSize(Alignment.Center),
-            color = Color.White
-
-
-        )
+        Row(
+            Modifier.fillMaxSize().wrapContentSize(Alignment.Center)
+        ) {
+            Loader()
+        }
 
 
     } else {
@@ -93,25 +95,45 @@ fun ContentHomeView(viewModel: GamesViewModel, pad: PaddingValues,navController:
             horizontalAlignment = Alignment.CenterHorizontally
 
         ) {
-            items(games) { item ->
-                CardGame(item) {
-                    navController.navigate("DetailView/${item.id}")
+            items(gamesPage.itemCount) { index ->
+                val item = gamesPage[index]
+                if (item != null) {
+
+                    CardGame(item) {
+                        navController.navigate("DetailView/${item.id}")
+                    }
+                    Text(
+                        text = item.name,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.White,
+                        modifier = Modifier.padding(start = 10.dp),
+                    )
                 }
-                Text(
-                    text = item.name,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color.White,
-                    modifier = Modifier.padding(start = 10.dp),
-                )
+
+            }
+            //cuando haya agregado datos
+            when (gamesPage.loadState.append) {
+                is LoadState.NotLoading -> Unit
+                LoadState.Loading -> {
+                    item {
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp)) {
+                            Loader()
+                        }
+                    }
+
+                }
+
+                is LoadState.Error -> {
+                    item {
+                        Text(text = "Error")
+                    }
+                }
             }
         }
     }
 }
-
-
-
-
-
 
 
 //@Composable

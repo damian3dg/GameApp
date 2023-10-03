@@ -7,6 +7,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
+import com.example.gameapp.data.GamesDataSource
 import com.example.gameapp.model.GameList
 import com.example.gameapp.model.GameModelFree
 import com.example.gameapp.model.GamesModel
@@ -41,8 +45,13 @@ class GamesViewModel @Inject constructor(private val repo: GamesRepository) : Vi
         private set
 
     init {
-        fetchGames()
+        //fetchGames()
     }
+
+    var  gamesPage  = Pager(PagingConfig(pageSize = 5)){
+        GamesDataSource(repo,"HomeScreen")
+    }.flow.cachedIn(viewModelScope)
+        private set
 
     private fun fetchGames() {
 
@@ -59,47 +68,40 @@ class GamesViewModel @Inject constructor(private val repo: GamesRepository) : Vi
     }
 
 
-    private fun fetchFeeGames() {
 
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                //Aca ejecutamos la funcion que esta dentro del repository sin instanciarla ya que esta inyectada
-                val result = repo.getGamesFree()
-
-                //En caso de que no venga nada le ponemos una emptyList
-                _gamesFree.value = result ?: emptyList()
-
-            }
-
-        }
-    }
 
      fun fetchSearchGames(name:String) {
-         _isLoading.value = true
-        viewModelScope.launch {
-
-            withContext(Dispatchers.IO) {
-                try {
-                    val result = repo.getSearchGames(reemplazarEspaciosConGuionesBajos(name))
-
-                    _games.value = result ?: emptyList()
 
 
+         gamesPage  = Pager(PagingConfig(pageSize = 5)){
+             GamesDataSource(repo,name)
+         }.flow.cachedIn(viewModelScope)
 
-                } catch (e: Exception) {
-                    // Manejar errores si es necesario
-                } finally {
-                    // Indicar que la carga ha terminado, ya sea con éxito o error
-                    _isLoading.value = false
-                }
-
-
-
-
-
-            }
-
-        }
+//         _isLoading.value = true
+//        viewModelScope.launch {
+//
+//            withContext(Dispatchers.IO) {
+//                try {
+//                    val result = repo.getSearchGames(reemplazarEspaciosConGuionesBajos(name))
+//
+//                    _games.value = result ?: emptyList()
+//
+//
+//
+//                } catch (e: Exception) {
+//                    // Manejar errores si es necesario
+//                } finally {
+//                    // Indicar que la carga ha terminado, ya sea con éxito o error
+//                    _isLoading.value = false
+//                }
+//
+//
+//
+//
+//
+//            }
+//
+//        }
     }
 //Parametro que estamos enviando de una vista a otra. Por que se pasa a otra clase lo que recibimos?
 @SuppressLint("SuspiciousIndentation")

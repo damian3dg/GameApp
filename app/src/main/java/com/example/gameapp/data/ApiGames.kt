@@ -18,15 +18,21 @@ interface ApiGames {
     @GET(ENDPOINT + API_KEY)
     suspend fun getGames(): Response<GamesModel>
 
-    @GET("https://www.freetogame.com/api/games")
-    suspend fun getGamesFree(): Response<List<GameModelFree>>
+    @GET(ENDPOINT + API_KEY)
+    suspend fun getGamesPaging(
+        @Query("page") page: Int,
+        @Query("page_size") pageSize: Int
+    ): GamesModel
+
 
     @GET(ENDPOINT + API_KEY)
     suspend fun getListGamesByName(
+        @Query("page") page: Int,
+        @Query("page_size") pageSize: Int,
         @Query(value = "search") search: String,
         @Query("ordering") ordering: String,
         @Query("search_exact") searchPrecise: Boolean,
-    ): Response<GamesModel>
+    ): GamesModel
 
     @GET(ENDPOINT + API_KEY)
     suspend fun getListGamesByDate(
@@ -38,10 +44,10 @@ interface ApiGames {
     @GET("$ENDPOINT/{id}$API_KEY")
     suspend fun getGameById(@Path(value = "id") id: Int): Response<SingleGameModel>
 
-        @GET("$ENDPOINT/{game_pk}/screenshots$API_KEY")
-        suspend fun getScreenshotsForGame(
-            @Path(value ="game_pk") gamePk: String,
-        ): Response<GamesModelScreenShoot>
+    @GET("$ENDPOINT/{game_pk}/screenshots$API_KEY")
+    suspend fun getScreenshotsForGame(
+        @Path(value = "game_pk") gamePk: String,
+    ): Response<GamesModelScreenShoot>
 
 }
 
