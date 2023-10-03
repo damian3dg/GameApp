@@ -96,7 +96,7 @@ fun MainTopBar(title: String, showBackButton: Boolean = false, onClickBackButton
 fun CardGame(game: GameList, onClick: () -> Unit) {
 
     Card(
-        shape = RoundedCornerShape(15.dp),
+        shape = RoundedCornerShape(20.dp),
         modifier = Modifier
             .padding(10.dp)
             .shadow(40.dp)
@@ -134,10 +134,10 @@ fun MainImage(image: String) {
             .build(),
         contentDescription = "",
         modifier = Modifier
-            .fillMaxSize()
-            .height(250.dp),
+            .width(130.dp)
+            .height(130.dp),
         contentScale = ContentScale.Crop,
-        error = painterResource(R.drawable.placeholder)
+        error = painterResource(R.drawable.ic_launcher_background)
 
 
     )
@@ -148,7 +148,7 @@ fun MainImage(image: String) {
 
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .placeholder(R.drawable.placeholder)
+                .placeholder(R.drawable.ic_launcher_background)
                 .crossfade(true)
                 .build(),
             contentDescription = "",
