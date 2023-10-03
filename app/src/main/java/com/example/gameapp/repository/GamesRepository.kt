@@ -24,7 +24,7 @@ class GamesRepository @Inject constructor(private val apiGames: ApiGames) {
 
     suspend fun getGames(): List<GameList>? {
         //Llamamos a a la api games de la interface , la tenemos inyectada en el contructor, por ende no hace falta instanciarla
-        val response = apiGames.getGames()
+        val response = apiGames.getListGamesByDate()
         if (response.isSuccessful) {
             //Pedimos que sea tipo results por que es lo que devuelve la funcion
             return response.body()?.results
@@ -45,8 +45,8 @@ class GamesRepository @Inject constructor(private val apiGames: ApiGames) {
          }
         suspend fun getGameById(id:Int):SingleGameModel? {
         val response = apiGames.getGameById(id)
-
         if(response.isSuccessful){
+            Log.d("Api games",response.body().toString())
             return response.body()
         }
         return null

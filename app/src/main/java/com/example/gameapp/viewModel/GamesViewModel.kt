@@ -50,7 +50,6 @@ class GamesViewModel @Inject constructor(private val repo: GamesRepository) : Vi
             withContext(Dispatchers.IO) {
                 //Aca ejecutamos la funcion que esta dentro del repository sin instanciarla ya que esta inyectada
                 val result = repo.getGames()
-
                 //En caso de que no venga nada le ponemos una emptyList
                 _games.value = result ?: emptyList()
 
@@ -119,6 +118,7 @@ fun getGameById(id:Int){
                         metacritic = result?.metacritic ?: 111,
                         background_image = result?.background_image ?: "",
                         website = result?.website ?: "sin web",
+                        released = result?.released?: "no date"
                         )
                 } catch (e: Exception) {
                     // Manejar errores si es necesario

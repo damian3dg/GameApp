@@ -87,6 +87,9 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.10")
 
+//Paging
+    implementation("androidx.paging:paging-runtime:3.1.1")
+    implementation("androidx.paging:paging-compose:1.0.0-alpha18")
 // Se implenta para hacer debug
 
     //implementation("androidx.compose.runtime:runtime-tracing:1.0.0-alpha01")

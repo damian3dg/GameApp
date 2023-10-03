@@ -2,10 +2,13 @@ package com.example.gameapp.components
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -149,8 +153,8 @@ fun MainImage(image: String) {
 }
 
 @Composable
-fun MetaWebSite(url: String) {
-
+fun MetaWebSite(url: String,release:String) {
+    Log.d("release",release)
     val context = LocalContext.current
     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
     Column() {
@@ -168,6 +172,25 @@ fun MetaWebSite(url: String) {
             )
         ) {
             Text(text = "Sitio Web")
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            // Agrega el icono de reloj
+            Icon(
+                imageVector = Icons.Default.DateRange, // Puedes elegir otro icono si lo deseas
+                contentDescription = null, // Puedes agregar una descripción si es necesario
+                tint = Color.White, // Cambia el color del icono si es necesario
+            )
+
+            // Agrega el texto del metascore
+            Text(
+                text = release,
+                color = Color.White,
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 15.sp,
+            )
         }
     }
 

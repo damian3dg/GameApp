@@ -1,6 +1,7 @@
 package com.example.gameapp.view
 
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -153,7 +154,8 @@ fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel, id: Int) {
                 .padding(start = 20.dp, end = 5.dp)
         ) {
 
-            MetaWebSite(state.website)
+            MetaWebSite(state.website,state.released)
+
             ReviewCard(metascore = (state.metacritic))
         }
         val scroll = rememberScrollState(0)
@@ -203,7 +205,7 @@ fun ScreenshotsView(gamePk: String, screenshots: List<ScreenShot>) {
                     .fillMaxWidth()
                     .padding(10.dp)
                     .height(200.dp),
-
+                beyondBoundsPageCount = 2
                 //.background(Color.Red),
 
 //                pageSpacing = 10.dp,

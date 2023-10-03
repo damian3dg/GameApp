@@ -28,6 +28,12 @@ interface ApiGames {
         @Query("search_exact") searchPrecise: Boolean,
     ): Response<GamesModel>
 
+    @GET(ENDPOINT + API_KEY)
+    suspend fun getListGamesByDate(
+        @Query("dates") dates: String = "2018-01-01,2023-12-31",
+        @Query("page_size") page_size: Int = 50,
+    ): Response<GamesModel>
+
     //Es el equivalente a esto https://api.rawg.io/api/games/1123?key=eb61c283c59445a2b1dd68285981dbda
     @GET("$ENDPOINT/{id}$API_KEY")
     suspend fun getGameById(@Path(value = "id") id: Int): Response<SingleGameModel>
