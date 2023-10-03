@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 
 import androidx.compose.foundation.lazy.items
 
@@ -40,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.paging.LoadState
@@ -80,58 +82,68 @@ fun ContentHomeView(viewModel: GamesViewModel, pad: PaddingValues, navController
         // Muestra el ProgressBar mientras se carga
 
         Row(
-            Modifier.fillMaxSize().wrapContentSize(Alignment.Center)
+            Modifier
+                .fillMaxSize()
+                .wrapContentSize(Alignment.Center)
         ) {
             Loader()
         }
 
 
     } else {
-        LazyColumn(
-
-            modifier = Modifier
-                .padding(pad)
-                .background(Color(0xFF0E0D0D)),
-            horizontalAlignment = Alignment.CenterHorizontally
-
-        ) {
-            items(gamesPage.itemCount) { index ->
-                val item = gamesPage[index]
-                if (item != null) {
-
-                    CardGame(item) {
-                        navController.navigate("DetailView/${item.id}")
-                    }
-                    Text(
-                        text = item.name,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color.White,
-                        modifier = Modifier.padding(start = 10.dp),
-                    )
-                }
-
+        Column(modifier = Modifier
+            .padding(pad)) {
+            Row( ) {
+                Text(text = "Popular",
+                    fontWeight = FontWeight.ExtraBold,)
             }
-            //cuando haya agregado datos
-            when (gamesPage.loadState.append) {
-                is LoadState.NotLoading -> Unit
-                LoadState.Loading -> {
-                    item {
-                        Row(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp)) {
-                            Loader()
+            LazyRow(
+//            horizontalAlignment = Alignment.CenterHorizontally
+
+            ) {
+                items(gamesPage.itemCount) { index ->
+                    val item = gamesPage[index]
+                    if (item != null) {
+
+                        Column(Modifier.width(150.dp)) {
+                            CardGame(item) {
+                                navController.navigate("DetailView/${item.id}")
+                            }
+                            Text(
+                                text = item.name,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color.White,
+                                modifier = Modifier.padding(start = 10.dp),
+                                fontSize = 12.sp
+                            )
                         }
+
                     }
 
                 }
+                //cuando haya agregado datos
+                when (gamesPage.loadState.append) {
+                    is LoadState.NotLoading -> Unit
+                    LoadState.Loading -> {
+                        item {
+                            Row(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp)) {
+                                Loader()
+                            }
+                        }
 
-                is LoadState.Error -> {
-                    item {
-                        Text(text = "Error")
+                    }
+
+                    is LoadState.Error -> {
+                        item {
+                            Text(text = "Error")
+                        }
                     }
                 }
             }
         }
+
     }
 }
 
