@@ -91,54 +91,59 @@ fun ContentHomeView(viewModel: GamesViewModel, pad: PaddingValues, navController
 
 
     } else {
-        LazyRow(
-
-            modifier = Modifier
-                .padding(pad)
-
+        Column(modifier = Modifier
+            .padding(pad)) {
+            Row( ) {
+                Text(text = "Popular",
+                    fontWeight = FontWeight.ExtraBold,)
+            }
+            LazyRow(
 //            horizontalAlignment = Alignment.CenterHorizontally
 
-        ) {
-            items(gamesPage.itemCount) { index ->
-                val item = gamesPage[index]
-                if (item != null) {
-                    Column(Modifier.width(150.dp)) {
-                        CardGame(item) {
-                            navController.navigate("DetailView/${item.id}")
+            ) {
+                items(gamesPage.itemCount) { index ->
+                    val item = gamesPage[index]
+                    if (item != null) {
+
+                        Column(Modifier.width(150.dp)) {
+                            CardGame(item) {
+                                navController.navigate("DetailView/${item.id}")
+                            }
+                            Text(
+                                text = item.name,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color.White,
+                                modifier = Modifier.padding(start = 10.dp),
+                                fontSize = 12.sp
+                            )
                         }
-                        Text(
-                            text = item.name,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color.White,
-                            modifier = Modifier.padding(start = 10.dp),
-                            fontSize = 12.sp
-                        )
+
                     }
 
                 }
-
-            }
-            //cuando haya agregado datos
-            when (gamesPage.loadState.append) {
-                is LoadState.NotLoading -> Unit
-                LoadState.Loading -> {
-                    item {
-                        Row(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp)) {
-                            Loader()
+                //cuando haya agregado datos
+                when (gamesPage.loadState.append) {
+                    is LoadState.NotLoading -> Unit
+                    LoadState.Loading -> {
+                        item {
+                            Row(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp)) {
+                                Loader()
+                            }
                         }
+
                     }
 
-                }
-
-                is LoadState.Error -> {
-                    item {
-                        Text(text = "Error")
+                    is LoadState.Error -> {
+                        item {
+                            Text(text = "Error")
+                        }
                     }
                 }
             }
         }
+
     }
 }
 
