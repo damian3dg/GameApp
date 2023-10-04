@@ -3,10 +3,11 @@ package com.example.gameapp.components
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -39,15 +39,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.gameapp.R
@@ -95,7 +93,7 @@ fun MainTopBar(title: String, showBackButton: Boolean = false, onClickBackButton
 }
 
 @Composable
-fun CardGame(game: GameList, from : String = "", onClick: () -> Unit) {
+fun CardGame(game: GameList, onClick: () -> Unit) {
 
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -108,17 +106,17 @@ fun CardGame(game: GameList, from : String = "", onClick: () -> Unit) {
         ) {
         Column {
             if (game.background_image != null){
-            MainImage(image = game.background_image,from)
+            MainImage(image = game.background_image)
         }
             else{
-                MainImage(image = "","")
+                MainImage(image = "")
                  }
             }
     }
 }
 
 @Composable
-fun MainImage(image: String,from: String) {
+fun MainImage(image: String) {
     if (image != null){
     val imagenModificada = image.replace("/media/", "/media/crop/600/400/")
     val painter = rememberAsyncImagePainter(imagenModificada)
@@ -159,8 +157,6 @@ fun MainImage(image: String,from: String) {
         )
 
     }
-
-
 
 
 //    Image(
@@ -255,142 +251,10 @@ fun Loader(){
         CircularProgressIndicator(
             modifier = Modifier
                 .fillMaxSize()
-                .wrapContentSize(),
+                .wrapContentSize(Alignment.Center),
             color = Color.White
         )
     }
 
-}
-
-@Composable
-
-fun PopularGames(popularGames: LazyPagingItems<GameList>, navController: NavController, pad: PaddingValues){
-    Column(
-        modifier = Modifier
-            .padding(pad)
-    ) {
-        Row() {
-            Text(
-                text = "Popular",
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.padding(5.dp)
-            )
-        }
-        LazyRow(
-//            horizontalAlignment = Alignment.CenterHorizontally
-
-        ) {
-            items(popularGames.itemCount) { index ->
-                val item = popularGames[index]
-                if (item != null) {
-
-                    Column(Modifier.width(150.dp)) {
-                        CardGame(item) {
-                            navController.navigate("DetailView/${item.id}")
-                        }
-                        Text(
-                            text = item.name,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color.White,
-                            modifier = Modifier.padding(start = 10.dp),
-                            fontSize = 12.sp
-                        )
-                    }
-
-                }
-
-            }
-            //cuando haya agregado datos
-            when (popularGames.loadState.append) {
-                is LoadState.NotLoading -> Unit
-                LoadState.Loading -> {
-                    item {
-                        Column(
-                            modifier = Modifier
-                                .width(150.dp)
-                                .height(150.dp)
-                                .padding(12.dp)
-                                .align(Alignment.CenterHorizontally)
-                        ) {
-                            Loader()
-                        }
-                    }
-
-                }
-
-                is LoadState.Error -> {
-                    item {
-                        Text(text = "Error")
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-
-fun NextWeekGames(popularGames: LazyPagingItems<GameList>, navController: NavController, pad: Dp){
-    Column(
-        modifier = Modifier
-            .padding(pad)
-    ) {
-        Row() {
-            Text(
-                text = "Current Week",
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.padding(5.dp)
-            )
-        }
-        LazyRow(
-//            horizontalAlignment = Alignment.CenterHorizontally
-
-        ) {
-            items(popularGames.itemCount) { index ->
-                val item = popularGames[index]
-                if (item != null) {
-
-                    Column(Modifier.width(150.dp)) {
-                        CardGame(item) {
-                            navController.navigate("DetailView/${item.id}")
-                        }
-                        Text(
-                            text = item.name,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color.White,
-                            modifier = Modifier.padding(start = 10.dp),
-                            fontSize = 12.sp
-                        )
-                    }
-
-                }
-
-            }
-            //cuando haya agregado datos
-            when (popularGames.loadState.append) {
-                is LoadState.NotLoading -> Unit
-                LoadState.Loading -> {
-                    item {
-                        Column(
-                            modifier = Modifier
-                                .width(150.dp)
-                                .height(150.dp)
-                                .padding(12.dp)
-                                .align(Alignment.CenterHorizontally)
-                        ) {
-                            Loader()
-                        }
-                    }
-
-                }
-
-                is LoadState.Error -> {
-                    item {
-                        Text(text = "Error")
-                    }
-                }
-            }
-        }
-    }
 }
 

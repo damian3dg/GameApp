@@ -18,7 +18,7 @@ class GamesDataSource(private val repo: GamesRepository, private val layout:Stri
     override suspend fun load(params: PagingSource.LoadParams<Int>): PagingSource.LoadResult<Int, GameList> {
         return try {
             val nextPageNumber = params.key ?: 1
-            Log.d("entro","entro")
+
             val response:GamesModel
 
             if (layout == "HomeScreen"){

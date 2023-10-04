@@ -34,7 +34,6 @@ fun SearchGameView(viewModel: GamesViewModel, navController: NavController) {
     val games by viewModel.games.collectAsState()
 
 
-
     SearchBar(
         modifier = Modifier
             .fillMaxWidth()
@@ -45,8 +44,7 @@ fun SearchGameView(viewModel: GamesViewModel, navController: NavController) {
             active = false
             if (query.isNotEmpty()) {
                 viewModel.fetchSearchGames(query)
-                Log.d("pasa por query","pasa por query")
-                navController.navigate("GameSearching")
+                navController.popBackStack()
 
             }
         },
