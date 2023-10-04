@@ -46,7 +46,9 @@ fun SearchGameView(viewModel: GamesViewModel, navController: NavController) {
             if (query.isNotEmpty()) {
                 viewModel.fetchSearchGames(query)
                 Log.d("pasa por query","pasa por query")
-                navController.navigate("GameSearching")
+                navController.navigate("GameSearching") {
+                    popUpTo("SearchGameView") { inclusive = true }
+                }
 
             }
         },

@@ -58,32 +58,29 @@ class GamesViewModel @Inject constructor(private val repo: GamesRepository) : Vi
     }
 
     var  popularGames  = Pager(PagingConfig(pageSize = 5)){
-        GamesDataSource(repo,"HomeScreen")
+        GamesDataSource(repo,"popularGames")
+    }.flow.cachedIn(viewModelScope)
+        private set
+
+    var  currentGamesWeek  = Pager(PagingConfig(pageSize = 5)){
+        GamesDataSource(repo,"currentWeek")
     }.flow.cachedIn(viewModelScope)
         private set
 
 
-
-
-
-
-
-
-    private fun fetchGames() {
-
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                //Aca ejecutamos la funcion que esta dentro del repository sin instanciarla ya que esta inyectada
-                val result = repo.getGames()
-                //En caso de que no venga nada le ponemos una emptyList
-                _games.value = result ?: emptyList()
-
-            }
-
-        }
-    }
-
-
+//    private fun fetchGames() {
+//
+//        viewModelScope.launch {
+//            withContext(Dispatchers.IO) {
+//                //Aca ejecutamos la funcion que esta dentro del repository sin instanciarla ya que esta inyectada
+//                val result = repo.getGames()
+//                //En caso de que no venga nada le ponemos una emptyList
+//                _games.value = result ?: emptyList()
+//
+//            }
+//
+//        }
+//    }
 
 
      fun fetchSearchGames(name:String) {

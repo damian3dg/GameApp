@@ -268,6 +268,7 @@ fun PopularGames(popularGames: LazyPagingItems<GameList>, navController: NavCont
     Column(
         modifier = Modifier
             .padding(pad)
+            .height(250.dp)
     ) {
         Row() {
             Text(

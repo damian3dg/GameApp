@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.Divider
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -41,6 +42,8 @@ fun HomeView(viewModel: GamesViewModel, navController: NavController) {
 fun ContentHomeView(viewModel: GamesViewModel, pad: PaddingValues, navController: NavController) {
     val games by viewModel.games.collectAsState()
     val popularGames = viewModel.popularGames.collectAsLazyPagingItems()
+    val currentGamesWeek = viewModel.currentGamesWeek.collectAsLazyPagingItems()
+
     val currentWeek = viewModel.popularGames.collectAsLazyPagingItems()
     val nextWeek = viewModel.popularGames.collectAsLazyPagingItems()
     val gamesFree by viewModel.gamesFree.collectAsState()
@@ -62,7 +65,7 @@ fun ContentHomeView(viewModel: GamesViewModel, pad: PaddingValues, navController
     } else {
         Column {
             PopularGames(popularGames, navController, pad)
-            NextWeekGames(popularGames, navController, 0.dp)
+            NextWeekGames(currentGamesWeek, navController, 0.dp)
         }
 
 
