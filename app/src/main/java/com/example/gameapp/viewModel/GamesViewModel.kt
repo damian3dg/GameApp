@@ -7,8 +7,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.gameapp.data.GamesDataSource
 import com.example.gameapp.model.GameList
@@ -19,9 +21,11 @@ import com.example.gameapp.repository.GamesRepository
 import com.example.gameapp.state.GameState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -44,14 +48,26 @@ class GamesViewModel @Inject constructor(private val repo: GamesRepository) : Vi
     var state by mutableStateOf(GameState())
         private set
 
+
+    private var searchGames: Flow<PagingData<GameList>>? = null
+    var searchGamesNonNull: Flow<PagingData<GameList>> = searchGames ?: emptyFlow()
+
+
     init {
         //fetchGames()
     }
 
-    var  gamesPage  = Pager(PagingConfig(pageSize = 5)){
+    var  popularGames  = Pager(PagingConfig(pageSize = 5)){
         GamesDataSource(repo,"HomeScreen")
     }.flow.cachedIn(viewModelScope)
         private set
+
+
+
+
+
+
+
 
     private fun fetchGames() {
 
@@ -72,10 +88,12 @@ class GamesViewModel @Inject constructor(private val repo: GamesRepository) : Vi
 
      fun fetchSearchGames(name:String) {
 
-
-         gamesPage  = Pager(PagingConfig(pageSize = 5)){
+         searchGamesNonNull  = Pager(PagingConfig(pageSize = 5)){
              GamesDataSource(repo,name)
          }.flow.cachedIn(viewModelScope)
+
+         Log.d("fetchSearchGames",searchGames.toString())
+
 
 //         _isLoading.value = true
 //        viewModelScope.launch {
