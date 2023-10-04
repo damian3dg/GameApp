@@ -102,8 +102,9 @@ fun CardGame(game: GameList, from : String = "", onClick: () -> Unit) {
         modifier = Modifier
             .padding(10.dp)
             .shadow(40.dp)
+            .width(130.dp)
+            .height(130.dp)
             .clickable { onClick() },
-
 
         ) {
         Column {
@@ -136,8 +137,7 @@ fun MainImage(image: String,from: String) {
             .build(),
         contentDescription = "",
         modifier = Modifier
-            .width(130.dp)
-            .height(130.dp),
+            .fillMaxSize(),
         contentScale = ContentScale.Crop,
         error = painterResource(R.drawable.ic_launcher_background)
 
@@ -331,7 +331,7 @@ fun PopularGames(popularGames: LazyPagingItems<GameList>, navController: NavCont
 
 @Composable
 
-fun NextWeekGames(popularGames: LazyPagingItems<GameList>, navController: NavController, pad: Dp){
+fun CurrentWeek(popularGames: LazyPagingItems<GameList>, navController: NavController, pad: Dp){
     Column(
         modifier = Modifier
             .padding(pad)

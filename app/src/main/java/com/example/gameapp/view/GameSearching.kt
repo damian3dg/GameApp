@@ -31,6 +31,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.gameapp.components.CardGame
+import com.example.gameapp.components.CardGameFromSearch
 import com.example.gameapp.components.Loader
 import com.example.gameapp.model.GameList
 import com.example.gameapp.viewModel.GamesViewModel
@@ -38,11 +39,8 @@ import com.example.gameapp.viewModel.GamesViewModel
 @Composable
 fun GameSearching(viewModel: GamesViewModel, navController: NavController) {
 
-    Log.d("GameSearching","Se inicio el compose")
-
     val searchGames = viewModel.searchGamesNonNull.collectAsLazyPagingItems()
 
-    Log.d("valorsearchgames",searchGames.itemCount.toString())
 
     LazyColumn(
 //            horizontalAlignment = Alignment.CenterHorizontally
@@ -52,8 +50,8 @@ fun GameSearching(viewModel: GamesViewModel, navController: NavController) {
             val item = searchGames[index]
             if (item != null) {
 
-                Column(Modifier.width(150.dp)) {
-                    CardGame(item) {
+                Column() {
+                    CardGameFromSearch(item) {
                          navController.navigate("DetailView/${item.id}")
                     }
                     Text(

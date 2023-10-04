@@ -132,8 +132,6 @@ fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel, id: Int) {
     val state = viewModel.state
     val screenshots by viewModel.screenshots.collectAsState(emptyList())
 
-
-
     Column(
 
         modifier = Modifier

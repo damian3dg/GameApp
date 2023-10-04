@@ -18,9 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.gameapp.components.CurrentWeek
 import com.example.gameapp.components.Loader
 import com.example.gameapp.components.MainTopBar
-import com.example.gameapp.components.NextWeekGames
 import com.example.gameapp.components.PopularGames
 import com.example.gameapp.viewModel.GamesViewModel
 
@@ -65,7 +65,7 @@ fun ContentHomeView(viewModel: GamesViewModel, pad: PaddingValues, navController
     } else {
         Column {
             PopularGames(popularGames, navController, pad)
-            NextWeekGames(currentGamesWeek, navController, 0.dp)
+            CurrentWeek(currentGamesWeek, navController, 0.dp)
         }
 
 
