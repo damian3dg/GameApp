@@ -25,8 +25,8 @@ class GamesDataSource(private val repo: GamesRepository, private val layout:Stri
             val response:GamesModel
 
             when (layout) {
-                "popularGames" -> response = repo.getGamesPaging(nextPageNumber, 5)
-                "currentWeek" -> response = repo.getGamesByDate(nextPageNumber, 5,getCurrentWeekDates())
+                "popularGames" -> response = repo.getGamesPaging(nextPageNumber, 7)
+                "currentWeek" -> response = repo.getGamesByDate(nextPageNumber, 7,getCurrentWeekDates())
                 else -> response = repo.getSearchGames(nextPageNumber, 5,layout)
             }
 

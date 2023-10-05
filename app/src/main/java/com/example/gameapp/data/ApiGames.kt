@@ -2,7 +2,6 @@ package com.example.gameapp.data
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.example.gameapp.model.GameModelFree
 import com.example.gameapp.model.GamesModel
 import com.example.gameapp.model.GamesModelScreenShoot
 import com.example.gameapp.model.SingleGameModel
@@ -40,7 +39,7 @@ interface ApiGames {
     @GET(ENDPOINT + API_KEY)
     suspend fun getListGamesByDate(
         @Query("page") page: Int,
-        @Query("page_size") pageSize: Int = 5,
+        @Query("page_size") pageSize: Int,
         @Query("dates") dates: String
 
     ): GamesModel

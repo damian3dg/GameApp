@@ -6,19 +6,14 @@ data class GamesModel(
 
 )
 
-data class GameModelFree(
 
-    val id: Int,
-    val title: String,
-    val thumbnail: String,
-    val short_description: String
-
-)
 
 data class GameList(
     val id: Int,
     val name: String,
     val background_image: String,
+    val metacritic:Int,
+    val released: String
 )
 
 

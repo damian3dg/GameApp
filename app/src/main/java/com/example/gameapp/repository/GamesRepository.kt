@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.gameapp.data.ApiGames
 import com.example.gameapp.model.GameList
-import com.example.gameapp.model.GameModelFree
 import com.example.gameapp.model.GamesModel
 import com.example.gameapp.model.GamesModelScreenShoot
 import com.example.gameapp.model.ScreenShot

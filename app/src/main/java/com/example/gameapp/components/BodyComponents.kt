@@ -3,8 +3,10 @@ package com.example.gameapp.components
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,9 +14,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -34,6 +38,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -95,28 +100,98 @@ fun MainTopBar(title: String, showBackButton: Boolean = false, onClickBackButton
 }
 
 @Composable
-fun CardGame(game: GameList, from : String = "", onClick: () -> Unit) {
+fun CardGameCurrentWeek(game: GameList, from : String = "", onClick: () -> Unit) {
 
     Card(
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier
             .padding(10.dp)
             .shadow(40.dp)
-            .width(130.dp)
-            .height(130.dp)
+            .width(120.dp)
+            .height(120.dp)
             .clickable { onClick() },
 
         ) {
-        Column {
-            if (game.background_image != null){
-            MainImage(image = game.background_image,from)
-        }
-            else{
-                MainImage(image = "","")
-                 }
+
+        Box {
+            if (game.background_image != null) {
+                MainImage(image = game.background_image, from)
+            } else {
+                MainImage(image = "", "")
             }
+
+            // Texto en la esquina inferior derecha
+            Text(
+                text = game.released,
+                color = Color.White,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd) // Alinea el texto en la esquina inferior derecha
+                    .padding(4.dp)
+            )
+        }
     }
 }
+
+@Composable
+fun CardGamePopular(game: GameList, from : String = "", onClick: () -> Unit) {
+
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier
+            .padding(10.dp)
+            .shadow(40.dp)
+            .width(180.dp)
+            .height(180.dp)
+            .clickable { onClick() },
+
+        ) {
+
+        Box {
+            if (game.background_image != null) {
+                MainImage(image = game.background_image, from)
+            } else {
+                MainImage(image = "", "")
+            }
+
+            // Texto en la esquina inferior derecha
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd) // Alinea el cuadradito en la esquina superior izquierda
+                    .background(Color.Green) // Color del cuadradito
+                    .padding(4.dp), // Espaciado interno del cuadradito
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = game.metacritic.toString(), // Reemplaza "42" con el número de la API
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @Composable
 fun MainImage(image: String,from: String) {
@@ -159,6 +234,8 @@ fun MainImage(image: String,from: String) {
         )
 
     }
+
+
 
 
 
@@ -285,10 +362,11 @@ fun PopularGames(popularGames: LazyPagingItems<GameList>, navController: NavCont
                 val item = popularGames[index]
                 if (item != null) {
 
-                    Column(Modifier.width(150.dp)) {
-                        CardGame(item) {
+                    Column(Modifier.width(180.dp)) {
+                        CardGamePopular(item) {
                             navController.navigate("DetailView/${item.id}")
                         }
+
                         Text(
                             text = item.name,
                             fontWeight = FontWeight.ExtraBold,
@@ -331,14 +409,14 @@ fun PopularGames(popularGames: LazyPagingItems<GameList>, navController: NavCont
 
 @Composable
 
-fun CurrentWeek(popularGames: LazyPagingItems<GameList>, navController: NavController, pad: Dp){
+fun CurrentWeek(curretWeek: LazyPagingItems<GameList>, navController: NavController, pad: Dp){
     Column(
         modifier = Modifier
             .padding(pad)
     ) {
         Row() {
             Text(
-                text = "Current Week",
+                text = "Current released Week",
                 fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier.padding(5.dp)
             )
@@ -347,12 +425,12 @@ fun CurrentWeek(popularGames: LazyPagingItems<GameList>, navController: NavContr
 //            horizontalAlignment = Alignment.CenterHorizontally
 
         ) {
-            items(popularGames.itemCount) { index ->
-                val item = popularGames[index]
+            items(curretWeek.itemCount) { index ->
+                val item = curretWeek[index]
                 if (item != null) {
 
                     Column(Modifier.width(150.dp)) {
-                        CardGame(item) {
+                        CardGameCurrentWeek(item) {
                             navController.navigate("DetailView/${item.id}")
                         }
                         Text(
@@ -368,7 +446,7 @@ fun CurrentWeek(popularGames: LazyPagingItems<GameList>, navController: NavContr
 
             }
             //cuando haya agregado datos
-            when (popularGames.loadState.append) {
+            when (curretWeek.loadState.append) {
                 is LoadState.NotLoading -> Unit
                 LoadState.Loading -> {
                     item {

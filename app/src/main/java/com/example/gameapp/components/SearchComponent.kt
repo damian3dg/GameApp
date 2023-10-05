@@ -17,6 +17,7 @@ import com.example.gameapp.model.GameList
 @Composable
 fun CardGameFromSearch(game: GameList, from : String = "", onClick: () -> Unit) {
 
+
     Card(
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier

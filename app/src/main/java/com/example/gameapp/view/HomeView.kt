@@ -4,7 +4,9 @@ package com.example.gameapp.view
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Divider
 
@@ -40,15 +42,11 @@ fun HomeView(viewModel: GamesViewModel, navController: NavController) {
 
 @Composable
 fun ContentHomeView(viewModel: GamesViewModel, pad: PaddingValues, navController: NavController) {
-    val games by viewModel.games.collectAsState()
+    //val games by viewModel.games.collectAsState()
     val popularGames = viewModel.popularGames.collectAsLazyPagingItems()
     val currentGamesWeek = viewModel.currentGamesWeek.collectAsLazyPagingItems()
+    //val nextWeek = viewModel.popularGames.collectAsLazyPagingItems()
 
-    val currentWeek = viewModel.popularGames.collectAsLazyPagingItems()
-    val nextWeek = viewModel.popularGames.collectAsLazyPagingItems()
-    val gamesFree by viewModel.gamesFree.collectAsState()
-
-    val isLoading by viewModel.isLoading.collectAsState()
 
     if (popularGames.itemCount < 1) {
         // Muestra el ProgressBar mientras se carga
@@ -65,6 +63,7 @@ fun ContentHomeView(viewModel: GamesViewModel, pad: PaddingValues, navController
     } else {
         Column {
             PopularGames(popularGames, navController, pad)
+            Spacer(modifier = Modifier.padding(8.dp))
             CurrentWeek(currentGamesWeek, navController, 0.dp)
         }
 

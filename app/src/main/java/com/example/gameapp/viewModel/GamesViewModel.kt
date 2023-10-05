@@ -14,7 +14,6 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.gameapp.data.GamesDataSource
 import com.example.gameapp.model.GameList
-import com.example.gameapp.model.GameModelFree
 import com.example.gameapp.model.GamesModel
 import com.example.gameapp.model.ScreenShot
 import com.example.gameapp.repository.GamesRepository
@@ -36,9 +35,6 @@ class GamesViewModel @Inject constructor(private val repo: GamesRepository) : Vi
     //Que son los mutablestateflow
     private val _games = MutableStateFlow<List<GameList>>(emptyList())
     val games = _games.asStateFlow()
-
-    private val _gamesFree = MutableStateFlow<List<GameModelFree>>(emptyList())
-    val gamesFree = _gamesFree.asStateFlow()
 
     private val _screenshots = MutableStateFlow<List<ScreenShot>>(emptyList())
     val screenshots = _screenshots.asStateFlow()
@@ -89,7 +85,7 @@ class GamesViewModel @Inject constructor(private val repo: GamesRepository) : Vi
              GamesDataSource(repo,name)
          }.flow.cachedIn(viewModelScope)
 
-         Log.d("fetchSearchGames",searchGames.toString())
+
 
 
 //         _isLoading.value = true
