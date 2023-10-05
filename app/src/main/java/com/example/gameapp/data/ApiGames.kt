@@ -22,8 +22,11 @@ interface ApiGames {
     @GET(ENDPOINT + API_KEY)
     suspend fun getGamesPaging(
         @Query("page") page: Int,
-        @Query("page_size") pageSize: Int
-    ): GamesModel
+        @Query("page_size") pageSize: Int,
+        @Query("ordering") ordering: String = "-added",
+        @Query("dates") dates: String = "2022-01-01,2024-12-31"): GamesModel
+
+
 
 
     @GET(ENDPOINT + API_KEY)
