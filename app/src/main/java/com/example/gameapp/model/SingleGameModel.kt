@@ -1,5 +1,6 @@
 package com.example.gameapp.model
 
+
 import java.time.LocalDate
 
 data class SingleGameModel(
@@ -8,5 +9,16 @@ data class SingleGameModel(
     val metacritic: Int,
     val website: String,
     val background_image: String,
-    val released: String
+    val released: String,
+    val platforms : List<PlatformsItems>
+)
+
+data class PlatformsItems(
+    val platform : Platform,
+    val released_at : String
+)
+
+data class Platform(
+    val id : Int,
+    val name : String
 )

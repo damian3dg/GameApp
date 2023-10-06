@@ -58,10 +58,13 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
 import com.example.gameapp.R
+import com.example.gameapp.components.ImageDetail
 import com.example.gameapp.components.MainImage
 import com.example.gameapp.components.MainTopBar
 import com.example.gameapp.components.MetaWebSite
+import com.example.gameapp.components.PlatformList
 import com.example.gameapp.components.ReviewCard
+import com.example.gameapp.components.TextDescription
 import com.example.gameapp.model.ScreenShot
 import com.example.gameapp.util.Constants.Companion.CUSTOM_BLACK
 import com.example.gameapp.viewModel.GamesViewModel
@@ -131,6 +134,7 @@ fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel, id: Int) {
 
     val state = viewModel.state
     val screenshots by viewModel.screenshots.collectAsState(emptyList())
+    val scroll = rememberScrollState(0)
 
     Column(
 
@@ -138,11 +142,10 @@ fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel, id: Int) {
             .padding(pad)
             .background(Color(CUSTOM_BLACK))
             .fillMaxSize()
+            .verticalScroll(state=scroll, enabled = true )
 
     ) {
-        //MainImage(image = state.background_image)
-        ScreenshotsView(id.toString(), screenshots)
-
+        ImageDetail(image = state.background_image)
         Spacer(modifier = Modifier.height(10.dp))
         Row(
             //El spaceBetween los separa uno a la izq y el otro a la derecha
@@ -156,20 +159,17 @@ fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel, id: Int) {
 
             ReviewCard(metascore = (state.metacritic))
         }
-        val scroll = rememberScrollState(0)
-        Text(
-            text = state.description_raw,
-            color = Color.White,
-            textAlign = TextAlign.Justify,
-            modifier = Modifier
-                .padding(15.dp, 15.dp, 10.dp)
-                .verticalScroll(scroll),
+        TextDescription(description = state.description_raw)
+
+        PlatformList(state.platforms)
+        ScreenshotsView(id.toString(), screenshots)
 
 
-            )
 
     }
 }
+
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -203,12 +203,12 @@ fun ScreenshotsView(gamePk: String, screenshots: List<ScreenShot>) {
                     .fillMaxWidth()
                     .padding(10.dp)
                     .height(200.dp),
-                beyondBoundsPageCount = 2
+                beyondBoundsPageCount = 2,
                 //.background(Color.Red),
 
-//                pageSpacing = 10.dp,
-//                contentPadding = PaddingValues(horizontal = 65.dp)
-                //  pageSize = PageSize.Fixed(250.dp)
+                pageSpacing = 10.dp,
+                contentPadding = PaddingValues(horizontal = 65.dp),
+                  pageSize = PageSize.Fixed(250.dp)
             ) { page ->
                 val screenshot = screenshots[page]
                 val imagenModificada = screenshot.image.replace("/media/", "/media/crop/600/400/")

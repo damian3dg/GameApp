@@ -1,20 +1,19 @@
 package com.example.gameapp.viewModel
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.gameapp.data.GamesDataSource
 import com.example.gameapp.model.GameList
-import com.example.gameapp.model.GamesModel
+import com.example.gameapp.model.Platform
+import com.example.gameapp.model.PlatformsItems
 import com.example.gameapp.model.ScreenShot
 import com.example.gameapp.repository.GamesRepository
 import com.example.gameapp.state.GameState
@@ -128,10 +127,12 @@ fun getGameById(id:Int){
                     state = state.copy(
                         name = result?.name ?: "",
                         description_raw = result?.description_raw ?: "",
-                        metacritic = result?.metacritic ?: 111,
+                        metacritic = result?.metacritic ?: 0,
                         background_image = result?.background_image ?: "",
-                        website = result?.website ?: "sin web",
-                        released = result?.released?: "no date"
+                        website = result?.website?: "sin web",
+                        released = result?.released?: "no date",
+                        platforms = result?.platforms?: emptyList<PlatformsItems>(),
+
                         )
                 } catch (e: Exception) {
                     // Manejar errores si es necesario

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,8 +19,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
@@ -45,6 +48,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,6 +61,8 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.gameapp.R
 import com.example.gameapp.model.GameList
+import com.example.gameapp.model.Platform
+import com.example.gameapp.model.PlatformsItems
 import com.example.gameapp.util.Constants.Companion.CUSTOM_BLACK
 import com.example.gameapp.util.Constants.Companion.CUSTOM_GREEN
 
@@ -115,9 +121,9 @@ fun CardGameCurrentWeek(game: GameList, from : String = "", onClick: () -> Unit)
 
         Box {
             if (game.background_image != null) {
-                MainImage(image = game.background_image, from)
+                MainImage(image = game.background_image)
             } else {
-                MainImage(image = "", "")
+                MainImage(image = "")
             }
 
             // Texto en la esquina inferior derecha
@@ -150,9 +156,9 @@ fun CardGamePopular(game: GameList, from : String = "", onClick: () -> Unit) {
 
         Box {
             if (game.background_image != null) {
-                MainImage(image = game.background_image, from)
+                MainImage(image = game.background_image)
             } else {
-                MainImage(image = "", "")
+                MainImage(image = "")
             }
 
             // Texto en la esquina inferior derecha
@@ -191,10 +197,29 @@ fun CardGamePopular(game: GameList, from : String = "", onClick: () -> Unit) {
 
 
 
-
-
 @Composable
-fun MainImage(image: String,from: String) {
+fun ImageDetail(image: String) {
+    val imagenModificada = image.replace("/media/", "/media/crop/600/400/")
+
+//    val painter = rememberAsyncImagePainter(image)
+//    val state = painter.state
+
+    AsyncImage(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(imagenModificada)
+            .crossfade(true)
+            .build(),
+        contentDescription = "default crossfade example",
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(250.dp),
+        contentScale = ContentScale.Crop
+
+
+    )
+}
+@Composable
+fun MainImage(image: String) {
     if (image != null){
     val imagenModificada = image.replace("/media/", "/media/crop/600/400/")
     val painter = rememberAsyncImagePainter(imagenModificada)
@@ -471,5 +496,30 @@ fun CurrentWeek(curretWeek: LazyPagingItems<GameList>, navController: NavControl
             }
         }
     }
+}
+
+@Composable
+fun TextDescription(description:String){
+    val scroll = rememberScrollState(0)
+    Row(Modifier.height(250.dp)){
+        Text(
+            text = description,
+            color = Color.White,
+            textAlign = TextAlign.Justify,
+            modifier = Modifier
+                .padding(15.dp, 15.dp, 10.dp)
+                .verticalScroll(scroll),
+        )
+    }
+
+}
+
+@Composable
+fun PlatformList(item:List<PlatformsItems>){
+    //Creo una lista de nombres de plataforma
+    val platformNames = item.map { it.platform.name }
+    val commaSeparatedNames = platformNames.joinToString(", ")
+    Text(text = "Platforms")
+    Text(text = commaSeparatedNames)
 }
 

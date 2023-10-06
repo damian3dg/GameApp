@@ -30,10 +30,10 @@ fun CardGameFromSearch(game: GameList, from : String = "", onClick: () -> Unit) 
         ) {
         Column {
             if (game.background_image != null){
-                MainImage(image = game.background_image,from)
+                MainImage(image = game.background_image)
             }
             else{
-                MainImage(image = "","")
+                MainImage(image = "")
             }
         }
     }

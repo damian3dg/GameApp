@@ -24,7 +24,7 @@ interface ApiGames {
         @Query("page") page: Int,
         @Query("page_size") pageSize: Int,
         @Query("ordering") ordering: String = "-added",
-        @Query("dates") dates: String = "2022-01-01,2024-12-31"): GamesModel
+        @Query("dates") dates: String = "2023-01-01,2024-12-31"): GamesModel
 
 
 

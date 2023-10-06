@@ -1,7 +1,7 @@
 package com.example.gameapp.state
 
-import java.time.LocalDate
-import java.util.Date
+import com.example.gameapp.model.Platform
+import com.example.gameapp.model.PlatformsItems
 
 data class GameState(
     val name: String = "",
@@ -9,5 +9,6 @@ data class GameState(
     val metacritic: Int = 0,
     val website: String = "",
     val background_image: String = "",
-    val released: String = ""
+    val released: String = "",
+    val platforms : List<PlatformsItems> = emptyList()
 )
