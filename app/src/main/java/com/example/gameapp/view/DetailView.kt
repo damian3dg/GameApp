@@ -142,7 +142,7 @@ fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel, id: Int) {
             .padding(pad)
             .background(Color(CUSTOM_BLACK))
             .fillMaxSize()
-            .verticalScroll(state=scroll, enabled = true )
+            .verticalScroll(state = scroll, enabled = true)
 
     ) {
         ImageDetail(image = state.background_image)
@@ -162,6 +162,7 @@ fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel, id: Int) {
         TextDescription(description = state.description_raw)
 
         PlatformList(state.platforms)
+        Spacer(modifier = Modifier.height(10.dp))
         ScreenshotsView(id.toString(), screenshots)
 
 

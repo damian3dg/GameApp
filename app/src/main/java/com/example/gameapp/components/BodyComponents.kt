@@ -519,7 +519,7 @@ fun PlatformList(item:List<PlatformsItems>){
     //Creo una lista de nombres de plataforma
     val platformNames = item.map { it.platform.name }
     val commaSeparatedNames = platformNames.joinToString(", ")
-    Text(text = "Platforms")
+    Text(text = "Platforms:", fontWeight = FontWeight.Bold)
     Text(text = commaSeparatedNames)
 }
 
