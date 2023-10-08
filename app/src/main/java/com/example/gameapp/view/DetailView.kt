@@ -1,7 +1,6 @@
 package com.example.gameapp.view
 
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
@@ -24,17 +22,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DividerDefaults.color
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDefaults.color
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -48,18 +39,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.imageLoader
-import coil.request.CachePolicy
 import coil.request.ImageRequest
-import coil.transform.RoundedCornersTransformation
-import com.example.gameapp.R
 import com.example.gameapp.components.ImageDetail
-import com.example.gameapp.components.MainImage
 import com.example.gameapp.components.MainTopBar
 import com.example.gameapp.components.MetaWebSite
 import com.example.gameapp.components.PlatformList
@@ -146,30 +133,27 @@ fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel, id: Int) {
 
     ) {
         ImageDetail(image = state.background_image)
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(15.dp))
         Row(
             //El spaceBetween los separa uno a la izq y el otro a la derecha
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 5.dp)
+                .padding(15.dp)
         ) {
 
-            MetaWebSite(state.website,state.released)
-
+            MetaWebSite(state.website, state.released)
             ReviewCard(metascore = (state.metacritic))
         }
-        TextDescription(description = state.description_raw)
 
+
+        TextDescription(state.description_raw)
         PlatformList(state.platforms)
-        Spacer(modifier = Modifier.height(10.dp))
         ScreenshotsView(id.toString(), screenshots)
-
 
 
     }
 }
-
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -188,7 +172,7 @@ fun ScreenshotsView(gamePk: String, screenshots: List<ScreenShot>) {
         screenshots.count()
     }
 
-
+    Text(text = "ScreenShoots:", modifier = Modifier.padding(15.dp))
     Box(
         Modifier
             .fillMaxWidth()
@@ -198,21 +182,23 @@ fun ScreenshotsView(gamePk: String, screenshots: List<ScreenShot>) {
 
         if (screenshots.isNotEmpty()) {
 
+
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp)
                     .height(200.dp),
+
                 beyondBoundsPageCount = 2,
                 //.background(Color.Red),
 
                 pageSpacing = 10.dp,
                 contentPadding = PaddingValues(horizontal = 65.dp),
-                  pageSize = PageSize.Fixed(250.dp)
+                pageSize = PageSize.Fixed(250.dp)
             ) { page ->
                 val screenshot = screenshots[page]
-                val imagenModificada = screenshot.image.replace("/media/", "/media/crop/600/400/")
+                val imagenModificada = screenshot.image.replace("/media/", "/media/resize/420/-/")
                 val request: ImageRequest
                 with(density) {
                     request = ImageRequest.Builder(context)
@@ -232,8 +218,6 @@ fun ScreenshotsView(gamePk: String, screenshots: List<ScreenShot>) {
                             .height(170.dp)
                             .clip(RoundedCornerShape(10.dp)),
                         contentScale = ContentScale.Crop,
-
-
 
 
                         )

@@ -3,24 +3,24 @@ package com.example.gameapp.components
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -35,20 +35,33 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,15 +78,24 @@ import com.example.gameapp.model.Platform
 import com.example.gameapp.model.PlatformsItems
 import com.example.gameapp.util.Constants.Companion.CUSTOM_BLACK
 import com.example.gameapp.util.Constants.Companion.CUSTOM_GREEN
+import org.w3c.dom.Text
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainTopBar(title: String, showBackButton: Boolean = false, onClickBackButton: () -> Unit, onClickAction: () -> Unit){
+fun MainTopBar(
+    title: String,
+    showBackButton: Boolean = false,
+    onClickBackButton: () -> Unit,
+    onClickAction: () -> Unit
+) {
 
     //Creamos un topBar generico, no se por que no se usa el scaffold , investigar
     TopAppBar(title = {
         Text(
-            text = title, color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp
+            text = title,
+            color = Color.White,
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = 15.sp
         )
     }, colors = TopAppBarDefaults.mediumTopAppBarColors(
         containerColor = Color(CUSTOM_BLACK)
@@ -87,26 +109,25 @@ fun MainTopBar(title: String, showBackButton: Boolean = false, onClickBackButton
                 )
             }
         }
-    },
-        actions = {
-            if (!showBackButton) {
-                IconButton(onClick = onClickAction) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "",
-                        tint = Color.White
-                    )
-                }
+    }, actions = {
+        if (!showBackButton) {
+            IconButton(onClick = onClickAction) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "",
+                    tint = Color.White
+                )
             }
-
         }
+
+    }
 
     )
 
 }
 
 @Composable
-fun CardGameCurrentWeek(game: GameList, from : String = "", onClick: () -> Unit) {
+fun CardGameCurrentWeek(game: GameList, from: String = "", onClick: () -> Unit) {
 
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -141,7 +162,7 @@ fun CardGameCurrentWeek(game: GameList, from : String = "", onClick: () -> Unit)
 }
 
 @Composable
-fun CardGamePopular(game: GameList, from : String = "", onClick: () -> Unit) {
+fun CardGamePopular(game: GameList, from: String = "", onClick: () -> Unit) {
 
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -180,23 +201,6 @@ fun CardGamePopular(game: GameList, from : String = "", onClick: () -> Unit) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @Composable
 fun ImageDetail(image: String) {
     val imagenModificada = image.replace("/media/", "/media/crop/600/400/")
@@ -205,9 +209,7 @@ fun ImageDetail(image: String) {
 //    val state = painter.state
 
     AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(imagenModificada)
-            .crossfade(true)
+        model = ImageRequest.Builder(LocalContext.current).data(imagenModificada).crossfade(true)
             .build(),
         contentDescription = "default crossfade example",
         modifier = Modifier
@@ -218,51 +220,44 @@ fun ImageDetail(image: String) {
 
     )
 }
+
 @Composable
 fun MainImage(image: String) {
-    if (image != null){
-    val imagenModificada = image.replace("/media/", "/media/crop/600/400/")
-    val painter = rememberAsyncImagePainter(imagenModificada)
-    val state = painter.state
+    if (image != null) {
+        //val imagenModificada = image.replace("/media/", "/media/crop/600/400/")
+        val imagenModificada = image.replace("/media/", "/media/resize/420/-/")
+
+        val painter = rememberAsyncImagePainter(imagenModificada)
+        val state = painter.state
 
 
-    AsyncImage(
+        AsyncImage(
 
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(imagenModificada)
-            .memoryCachePolicy(CachePolicy.ENABLED)
-            .diskCachePolicy(CachePolicy.ENABLED)
-            .crossfade(true)
+            model = ImageRequest.Builder(LocalContext.current).data(imagenModificada)
+                .memoryCachePolicy(CachePolicy.ENABLED).diskCachePolicy(CachePolicy.ENABLED)
+                .crossfade(true)
 
-            .build(),
-        contentDescription = "",
-        modifier = Modifier
-            .fillMaxSize(),
-        contentScale = ContentScale.Crop,
-        error = painterResource(R.drawable.ic_launcher_background)
+                .build(),
+            contentDescription = "",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            error = painterResource(R.drawable.ic_launcher_background)
 
 
-    )
+        )
 
-     }else
-    {
+    } else {
 
 
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .placeholder(R.drawable.ic_launcher_background)
-                .crossfade(true)
-                .build(),
+                .placeholder(R.drawable.ic_launcher_background).crossfade(true).build(),
             contentDescription = "",
             contentScale = ContentScale.Crop,
 
-        )
+            )
 
     }
-
-
-
-
 
 
 //    Image(
@@ -281,35 +276,20 @@ fun MainImage(image: String) {
 }
 
 @Composable
-fun MetaWebSite(url: String,release:String) {
-    Log.d("release",release)
+fun MetaWebSite(url: String, release: String) {
+    Log.d("release", release)
     val context = LocalContext.current
     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
     Column() {
-        Text(
-            text = "METASCORE",
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            fontSize = 30.sp,
-            modifier = Modifier.padding(10.dp, 10.dp),
-        )
-        Button(
-            onClick = { context.startActivity(intent) }, colors = ButtonDefaults.buttonColors(
-                contentColor = Color.White,
-                containerColor = Color.Gray
-            )
-        ) {
-            Text(text = "Sitio Web")
-        }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // Agrega el icono de reloj
             Icon(
-                imageVector = Icons.Default.DateRange, // Puedes elegir otro icono si lo deseas
-                contentDescription = null, // Puedes agregar una descripción si es necesario
-                tint = Color.White, // Cambia el color del icono si es necesario
+                imageVector = Icons.Default.DateRange,
+                contentDescription = null,
+                tint = Color.White,
             )
 
             // Agrega el texto del metascore
@@ -320,6 +300,21 @@ fun MetaWebSite(url: String,release:String) {
                 fontSize = 15.sp,
             )
         }
+        Text(
+            text = "METASCORE",
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            fontSize = 30.sp,
+
+            )
+        Button(
+            onClick = { context.startActivity(intent) }, colors = ButtonDefaults.buttonColors(
+                contentColor = Color.White, containerColor = Color.Gray
+            )
+        ) {
+            Text(text = "Web")
+        }
+
     }
 
 }
@@ -327,17 +322,14 @@ fun MetaWebSite(url: String,release:String) {
 @Composable
 fun ReviewCard(metascore: Int) {
     Card(
-        modifier = Modifier
-            .padding(16.dp),
+        modifier = Modifier.padding(16.dp),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(CUSTOM_GREEN)
         )
-    )
-    {
+    ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = metascore.toString(),
@@ -352,13 +344,12 @@ fun ReviewCard(metascore: Int) {
 }
 
 @Composable
-fun Loader(){
+fun Loader() {
     Row(Modifier.fillMaxWidth()) {
         CircularProgressIndicator(
             modifier = Modifier
                 .fillMaxSize()
-                .wrapContentSize(),
-            color = Color.White
+                .wrapContentSize(), color = Color.White
         )
     }
 
@@ -366,7 +357,9 @@ fun Loader(){
 
 @Composable
 
-fun PopularGames(popularGames: LazyPagingItems<GameList>, navController: NavController, pad: PaddingValues){
+fun PopularGames(
+    popularGames: LazyPagingItems<GameList>, navController: NavController, pad: PaddingValues
+) {
     Column(
         modifier = Modifier
             .padding(pad)
@@ -434,10 +427,9 @@ fun PopularGames(popularGames: LazyPagingItems<GameList>, navController: NavCont
 
 @Composable
 
-fun CurrentWeek(curretWeek: LazyPagingItems<GameList>, navController: NavController, pad: Dp){
+fun CurrentWeek(curretWeek: LazyPagingItems<GameList>, navController: NavController, pad: Dp) {
     Column(
-        modifier = Modifier
-            .padding(pad)
+        modifier = Modifier.padding(pad)
     ) {
         Row() {
             Text(
@@ -498,28 +490,43 @@ fun CurrentWeek(curretWeek: LazyPagingItems<GameList>, navController: NavControl
     }
 }
 
-@Composable
-fun TextDescription(description:String){
-    val scroll = rememberScrollState(0)
-    Row(Modifier.height(250.dp)){
-        Text(
-            text = description,
-            color = Color.White,
-            textAlign = TextAlign.Justify,
-            modifier = Modifier
-                .padding(15.dp, 15.dp, 10.dp)
-                .verticalScroll(scroll),
-        )
-    }
 
+@Composable
+fun TextDescription(text:String){
+    var showMore by remember { mutableStateOf(false)
 }
 
+// Creating a long text
+
+    Column(modifier = Modifier.padding(20.dp)) {
+
+        Column(modifier = Modifier
+            .animateContentSize(animationSpec = tween(500))
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { showMore = !showMore }) {
+
+            if (showMore) {
+                Text(text = text)
+            } else {
+                Text(text = text, maxLines = 3, overflow = TextOverflow.Ellipsis)
+            }
+        }
+
+         }
+    }
+
 @Composable
-fun PlatformList(item:List<PlatformsItems>){
+fun PlatformList(item: List<PlatformsItems>) {
     //Creo una lista de nombres de plataforma
     val platformNames = item.map { it.platform.name }
     val commaSeparatedNames = platformNames.joinToString(", ")
-    Text(text = "Platforms:", fontWeight = FontWeight.Bold)
-    Text(text = commaSeparatedNames)
+
+    Column(Modifier.padding(15.dp)) {
+        Text(text = "Platforms:", fontWeight = FontWeight.Bold)
+        Text(text = commaSeparatedNames)
+    }
+
 }
 
