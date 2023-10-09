@@ -501,7 +501,7 @@ fun TextDescription(text:String){
     Column(modifier = Modifier.padding(20.dp)) {
 
         Column(modifier = Modifier
-            .animateContentSize(animationSpec = tween(500))
+            .animateContentSize(animationSpec = tween(300))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null

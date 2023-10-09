@@ -123,16 +123,24 @@ fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel, id: Int) {
     val screenshots by viewModel.screenshots.collectAsState(emptyList())
     val scroll = rememberScrollState(0)
 
-    Column(
-
+    Box(
         modifier = Modifier
             .padding(pad)
             .background(Color(CUSTOM_BLACK))
             .fillMaxSize()
             .verticalScroll(state = scroll, enabled = true)
+    ) {
+    ImageDetail(image = state.background_image)
+
+    Column(
+
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 200.dp)
+            .clip(RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)) // Redondea la parte superior
+            .background(Color(CUSTOM_BLACK))
 
     ) {
-        ImageDetail(image = state.background_image)
         Spacer(modifier = Modifier.height(15.dp))
         Row(
             //El spaceBetween los separa uno a la izq y el otro a la derecha
@@ -151,7 +159,7 @@ fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel, id: Int) {
         PlatformList(state.platforms)
         ScreenshotsView(id.toString(), screenshots)
 
-
+         }
     }
 }
 
