@@ -136,8 +136,8 @@ fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel, id: Int) {
 
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 200.dp)
-            .clip(RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)) // Redondea la parte superior
+            .padding(top = 215.dp)
+            .clip(RoundedCornerShape(topStart = 35.dp, topEnd = 35.dp)) // Redondea la parte superior
             .background(Color(CUSTOM_BLACK))
 
     ) {
@@ -150,7 +150,7 @@ fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel, id: Int) {
                 .padding(15.dp)
         ) {
 
-            MetaWebSite(state.website, state.released)
+            MetaWebSite(state.website, state.released, state.name)
             ReviewCard(metascore = (state.metacritic))
         }
 

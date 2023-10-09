@@ -276,11 +276,18 @@ fun MainImage(image: String) {
 }
 
 @Composable
-fun MetaWebSite(url: String, release: String) {
+fun MetaWebSite(url: String, release: String, name:String) {
     Log.d("release", release)
     val context = LocalContext.current
     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
     Column() {
+        Text(
+            text = name,
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            fontSize = 25.sp,
+
+            )
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -300,13 +307,7 @@ fun MetaWebSite(url: String, release: String) {
                 fontSize = 15.sp,
             )
         }
-        Text(
-            text = "METASCORE",
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            fontSize = 30.sp,
 
-            )
         Button(
             onClick = { context.startActivity(intent) }, colors = ButtonDefaults.buttonColors(
                 contentColor = Color.White, containerColor = Color.Gray
