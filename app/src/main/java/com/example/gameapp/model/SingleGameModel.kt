@@ -10,8 +10,15 @@ data class SingleGameModel(
     val website: String,
     val background_image: String,
     val released: String,
-    val platforms : List<PlatformsItems>
+    val platforms : List<PlatformsItems>,
+    val genres : List<Genres>,
+    val rating : String
 )
+
+class Genres (
+    val name : String
+)
+
 
 data class PlatformsItems(
     val platform : Platform,

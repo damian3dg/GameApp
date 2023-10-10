@@ -6,7 +6,6 @@ import androidx.annotation.RequiresApi
 import com.example.gameapp.data.ApiGames
 import com.example.gameapp.model.GameList
 import com.example.gameapp.model.GamesModel
-import com.example.gameapp.model.GamesModelScreenShoot
 import com.example.gameapp.model.ScreenShot
 import com.example.gameapp.model.SingleGameModel
 import javax.inject.Inject
@@ -47,6 +46,17 @@ class GamesRepository @Inject constructor(private val apiGames: ApiGames) {
 
     suspend fun getScreenshotsForGame(gamePk: String): List<ScreenShot>? {
         val response = apiGames.getScreenshotsForGame(gamePk)
+
+        if(response.isSuccessful){
+            return response.body()?.results
+        }
+        return null
+
+
+    }
+
+    suspend fun getTopGames(): List<GameList>? {
+        val response = apiGames.getTopGames()
 
         if(response.isSuccessful){
             return response.body()?.results

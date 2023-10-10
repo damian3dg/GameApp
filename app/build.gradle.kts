@@ -71,7 +71,7 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-
+    implementation("androidx.compose.ui:ui:1.3.3")
     //  Dagger Hilt
     implementation ("com.google.dagger:hilt-android:2.46.1")
 

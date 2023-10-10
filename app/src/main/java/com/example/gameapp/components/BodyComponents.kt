@@ -5,22 +5,32 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+
 import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -53,6 +63,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -70,15 +81,18 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import coil.imageLoader
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.gameapp.R
 import com.example.gameapp.model.GameList
+import com.example.gameapp.model.Genres
 import com.example.gameapp.model.Platform
 import com.example.gameapp.model.PlatformsItems
 import com.example.gameapp.util.Constants.Companion.CUSTOM_BLACK
 import com.example.gameapp.util.Constants.Companion.CUSTOM_GREEN
 import org.w3c.dom.Text
+import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -202,30 +216,56 @@ fun CardGamePopular(game: GameList, from: String = "", onClick: () -> Unit) {
 
 
 @Composable
-fun ImageDetail(image: String) {
+fun ImageDetail(image: String, navController: NavController) {
     val imagenModificada = image.replace("/media/", "/media/crop/600/400/")
 
 //    val painter = rememberAsyncImagePainter(image)
 //    val state = painter.state
 
-    AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current).data(imagenModificada).crossfade(true)
-            .build(),
-        contentDescription = "default crossfade example",
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(250.dp),
-        contentScale = ContentScale.Crop
+    Box {
+        // Imagen principal
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current).data(imagenModificada)
+                .crossfade(true)
+                .build(),
+            contentDescription = "Image",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp),
+            contentScale = ContentScale.Crop
+        )
 
+        // Ícono de flecha en la esquina superior izquierda
+        IconButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier
+                .padding(16.dp)
+                .size(48.dp)
+                .align(Alignment.TopStart)
 
-    )
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    .background(Color.White, shape = CircleShape)
+                    .padding(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.Black
+                )
+            }
+        }
+    }
 }
+
 
 @Composable
 fun MainImage(image: String) {
     if (image != null) {
-        //val imagenModificada = image.replace("/media/", "/media/crop/600/400/")
-        val imagenModificada = image.replace("/media/", "/media/resize/420/-/")
+        val imagenModificada = image.replace("/media/", "/media/crop/600/400/")
+        //val imagenModificada = image.replace("/media/", "/media/resize/420/-/")
 
         val painter = rememberAsyncImagePainter(imagenModificada)
         val state = painter.state
@@ -276,18 +316,44 @@ fun MainImage(image: String) {
 }
 
 @Composable
-fun MetaWebSite(url: String, release: String, name:String) {
-    Log.d("release", release)
-    val context = LocalContext.current
-    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-    Column() {
+
+fun Title(name: String, rating: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(15.dp)
+    ) {
         Text(
             text = name,
             color = Color.White,
             fontWeight = FontWeight.Bold,
             fontSize = 25.sp,
+            modifier = Modifier.weight(1f) // Este Text ocupará todo el espacio disponible
+        )
 
-            )
+        Text(
+            text = "$rating*",
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            fontSize = 19.sp,
+            modifier = Modifier.padding(start = 15.dp) // Agrega un espacio a la izquierda para separarlos
+        )
+    }
+}
+
+@Composable
+fun MetaWebSite(
+    url: String,
+    release: String,
+    item: List<PlatformsItems>,
+    itemGenres: List<Genres>
+) {
+    Log.d("release", release)
+    val context = LocalContext.current
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+
+    Column() {
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -308,17 +374,117 @@ fun MetaWebSite(url: String, release: String, name:String) {
             )
         }
 
-        Button(
-            onClick = { context.startActivity(intent) }, colors = ButtonDefaults.buttonColors(
-                contentColor = Color.White, containerColor = Color.Gray
-            )
-        ) {
-            Text(text = "Web")
-        }
+
+//        Button(
+//            onClick = { context.startActivity(intent) }, colors = ButtonDefaults.buttonColors(
+//                contentColor = Color.White, containerColor = Color.Gray
+//            )
+//        ) {
+//            Text(text = "Web")
+//        }
 
     }
 
 }
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun TopGames(games: List<GameList>, pad: PaddingValues) {
+
+    val pageCount = games.count()
+
+    val density = LocalDensity.current
+    val context = LocalContext.current
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        initialPageOffsetFraction = 0f
+    ) {
+        games.count()
+    }
+
+
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .height(300.dp)
+            .padding(pad)
+    ) {
+
+        if (games.isNotEmpty()) {
+
+
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+                    .height(190.dp),
+
+                beyondBoundsPageCount = 2,
+                //.background(Color.Red),
+
+                pageSpacing = 15.dp,
+                contentPadding = PaddingValues(horizontal = 50.dp),
+                pageSize = PageSize.Fixed(290.dp)
+            ) { page ->
+                val game = games[page]
+                val imagenModificada =
+                    game.background_image.replace("/media/", "/media/resize/420/-/")
+                val request: ImageRequest
+                with(density) {
+                    request = ImageRequest.Builder(context)
+                        .data(imagenModificada)
+                        .crossfade(enable = true)
+                        .build()
+                    context.imageLoader.enqueue(request)
+                }
+                Card {
+                    RoundedCornerShape(10.dp)
+
+
+
+                    AsyncImage(
+                        model = request,
+                        contentDescription = "default crossfade example",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(190.dp)
+                            .clip(RoundedCornerShape(10.dp)),
+                        contentScale = ContentScale.Crop,
+
+
+                        )
+                }
+            }
+        }
+
+
+        Row(
+            Modifier
+                .height(20.dp)
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            repeat(pageCount) { iteration ->
+                val color =
+                    if (pagerState.currentPage == iteration) Color.Yellow else Color.LightGray
+                Box(
+                    modifier = Modifier
+                        .padding(3.dp)
+                        .clip(CircleShape)
+                        .background(color)
+                        .size(10.dp)
+
+                )
+            }
+
+
+        }
+    }
+
+}
+
 
 @Composable
 fun ReviewCard(metascore: Int) {
@@ -359,11 +525,11 @@ fun Loader() {
 @Composable
 
 fun PopularGames(
-    popularGames: LazyPagingItems<GameList>, navController: NavController, pad: PaddingValues
+    popularGames: LazyPagingItems<GameList>, navController: NavController
 ) {
     Column(
         modifier = Modifier
-            .padding(pad)
+
             .height(250.dp)
     ) {
         Row() {
@@ -493,9 +659,10 @@ fun CurrentWeek(curretWeek: LazyPagingItems<GameList>, navController: NavControl
 
 
 @Composable
-fun TextDescription(text:String){
-    var showMore by remember { mutableStateOf(false)
-}
+fun TextDescription(text: String) {
+    var showMore by remember {
+        mutableStateOf(false)
+    }
 
 // Creating a long text
 
@@ -515,18 +682,28 @@ fun TextDescription(text:String){
             }
         }
 
-         }
     }
+}
 
 @Composable
-fun PlatformList(item: List<PlatformsItems>) {
+fun PlatformList(item: List<PlatformsItems>, itemGenres: List<Genres>, website: String) {
     //Creo una lista de nombres de plataforma
+    Log.d("genres", itemGenres.toString())
     val platformNames = item.map { it.platform.name }
+    val listItemGenres = itemGenres.map { it.name }
+
     val commaSeparatedNames = platformNames.joinToString(", ")
+    val commaSeparaGenres = listItemGenres.joinToString(", ")
 
     Column(Modifier.padding(15.dp)) {
         Text(text = "Platforms:", fontWeight = FontWeight.Bold)
         Text(text = commaSeparatedNames)
+        Spacer(modifier = Modifier.height(15.dp))
+        Text(text = "Genres:", fontWeight = FontWeight.Bold)
+        Text(text = commaSeparaGenres)
+        Spacer(modifier = Modifier.height(15.dp))
+        Text(text = "Website:", fontWeight = FontWeight.Bold)
+        Text(text = website)
     }
 
 }

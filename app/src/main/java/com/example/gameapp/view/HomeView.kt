@@ -24,6 +24,7 @@ import com.example.gameapp.components.CurrentWeek
 import com.example.gameapp.components.Loader
 import com.example.gameapp.components.MainTopBar
 import com.example.gameapp.components.PopularGames
+import com.example.gameapp.components.TopGames
 import com.example.gameapp.viewModel.GamesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,7 +43,7 @@ fun HomeView(viewModel: GamesViewModel, navController: NavController) {
 
 @Composable
 fun ContentHomeView(viewModel: GamesViewModel, pad: PaddingValues, navController: NavController) {
-    //val games by viewModel.games.collectAsState()
+    val games by viewModel.games.collectAsState()
     val popularGames = viewModel.popularGames.collectAsLazyPagingItems()
     val currentGamesWeek = viewModel.currentGamesWeek.collectAsLazyPagingItems()
     //val nextWeek = viewModel.popularGames.collectAsLazyPagingItems()
@@ -62,7 +63,8 @@ fun ContentHomeView(viewModel: GamesViewModel, pad: PaddingValues, navController
 
     } else {
         Column {
-            PopularGames(popularGames, navController, pad)
+            TopGames(games = games,pad)
+            PopularGames(popularGames, navController)
             Spacer(modifier = Modifier.padding(8.dp))
             CurrentWeek(currentGamesWeek, navController, 0.dp)
         }
@@ -70,6 +72,8 @@ fun ContentHomeView(viewModel: GamesViewModel, pad: PaddingValues, navController
 
     }
 }
+
+
 
 
 //@Composable

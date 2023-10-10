@@ -12,7 +12,6 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.gameapp.data.GamesDataSource
 import com.example.gameapp.model.GameList
-import com.example.gameapp.model.Platform
 import com.example.gameapp.model.PlatformsItems
 import com.example.gameapp.model.ScreenShot
 import com.example.gameapp.repository.GamesRepository
@@ -49,7 +48,7 @@ class GamesViewModel @Inject constructor(private val repo: GamesRepository) : Vi
 
 
     init {
-        //fetchGames()
+        fetchTopGames()
     }
 
     var  popularGames  = Pager(PagingConfig(pageSize = 5)){
@@ -130,8 +129,10 @@ fun getGameById(id:Int){
                         metacritic = result?.metacritic ?: 0,
                         background_image = result?.background_image ?: "",
                         website = result?.website?: "sin web",
-                        released = result?.released?: "no date",
+                        released = result?.released?: "no avaible",
                         platforms = result?.platforms?: emptyList<PlatformsItems>(),
+                        genres = result?.genres?: emptyList(),
+                        rating = result?.rating?: ""
 
                         )
                 } catch (e: Exception) {
@@ -161,6 +162,18 @@ fun getGameById(id:Int){
         }
                 }
             }
+
+    fun fetchTopGames() {
+        _isLoading.value = true
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val games = repo.getTopGames()
+                if (games != null) {
+                    _games.value = games
+                }
+            }
+        }
+    }
 
     fun clean(){
         state = state.copy(

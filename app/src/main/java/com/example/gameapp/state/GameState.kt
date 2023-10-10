@@ -1,6 +1,6 @@
 package com.example.gameapp.state
 
-import com.example.gameapp.model.Platform
+import com.example.gameapp.model.Genres
 import com.example.gameapp.model.PlatformsItems
 
 data class GameState(
@@ -10,5 +10,7 @@ data class GameState(
     val website: String = "",
     val background_image: String = "",
     val released: String = "",
-    val platforms : List<PlatformsItems> = emptyList()
+    val platforms: List<PlatformsItems> = emptyList(),
+    val genres: List<Genres> = emptyList(),
+    val rating : String = ""
 )

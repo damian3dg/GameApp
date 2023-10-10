@@ -40,6 +40,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -52,6 +53,7 @@ import com.example.gameapp.components.MetaWebSite
 import com.example.gameapp.components.PlatformList
 import com.example.gameapp.components.ReviewCard
 import com.example.gameapp.components.TextDescription
+import com.example.gameapp.components.Title
 import com.example.gameapp.model.ScreenShot
 import com.example.gameapp.util.Constants.Companion.CUSTOM_BLACK
 import com.example.gameapp.viewModel.GamesViewModel
@@ -77,20 +79,20 @@ fun DetailView(viewModel: GamesViewModel, navController: NavController, id: Int)
             viewModel.clean()
         }
     }
-
-    Scaffold(
-        topBar =
-        {
-
-            MainTopBar(
-                title = viewModel.state.name,
-
-                showBackButton = true,
-                onClickBackButton = { navController.popBackStack() },
-                onClickAction = {})
-
-        })
-    {
+//
+//    Scaffold(
+//        topBar =
+//        {
+//
+//            MainTopBar(
+//                title = viewModel.state.name,
+//
+//                showBackButton = true,
+//                onClickBackButton = { navController.popBackStack() },
+//                onClickAction = {})
+//
+//        })
+//
 
 
         val isLoading by viewModel.isLoading.collectAsState()
@@ -111,13 +113,13 @@ fun DetailView(viewModel: GamesViewModel, navController: NavController, id: Int)
 
         } else {
 
-            ContentDetailView(it, viewModel = viewModel, id)
+            ContentDetailView(viewModel = viewModel, id,navController)
         }
-    }
+
 }
 
 @Composable
-fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel, id: Int) {
+fun ContentDetailView(viewModel: GamesViewModel, id: Int,navController: NavController) {
 
     val state = viewModel.state
     val screenshots by viewModel.screenshots.collectAsState(emptyList())
@@ -125,12 +127,12 @@ fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel, id: Int) {
 
     Box(
         modifier = Modifier
-            .padding(pad)
+
             .background(Color(CUSTOM_BLACK))
             .fillMaxSize()
             .verticalScroll(state = scroll, enabled = true)
     ) {
-    ImageDetail(image = state.background_image)
+    ImageDetail(image = state.background_image, navController )
 
     Column(
 
@@ -142,6 +144,7 @@ fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel, id: Int) {
 
     ) {
         Spacer(modifier = Modifier.height(15.dp))
+        Title(state.name,state.rating)
         Row(
             //El spaceBetween los separa uno a la izq y el otro a la derecha
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -150,13 +153,13 @@ fun ContentDetailView(pad: PaddingValues, viewModel: GamesViewModel, id: Int) {
                 .padding(15.dp)
         ) {
 
-            MetaWebSite(state.website, state.released, state.name)
+            MetaWebSite(state.website, state.released,state.platforms,state.genres)
             ReviewCard(metascore = (state.metacritic))
         }
 
 
         TextDescription(state.description_raw)
-        PlatformList(state.platforms)
+        PlatformList(state.platforms,state.genres,state.website)
         ScreenshotsView(id.toString(), screenshots)
 
          }
@@ -179,8 +182,8 @@ fun ScreenshotsView(gamePk: String, screenshots: List<ScreenShot>) {
     ) {
         screenshots.count()
     }
+    Text(text = "ScreenShoots:",modifier = Modifier.padding(15.dp), fontWeight = FontWeight.Bold)
 
-    Text(text = "ScreenShoots:", modifier = Modifier.padding(15.dp))
     Box(
         Modifier
             .fillMaxWidth()
@@ -206,7 +209,7 @@ fun ScreenshotsView(gamePk: String, screenshots: List<ScreenShot>) {
                 pageSize = PageSize.Fixed(250.dp)
             ) { page ->
                 val screenshot = screenshots[page]
-                val imagenModificada = screenshot.image.replace("/media/", "/media/resize/420/-/")
+                val imagenModificada = screenshot.image.replace("/media/", "/media/crop/600/400/")
                 val request: ImageRequest
                 with(density) {
                     request = ImageRequest.Builder(context)
