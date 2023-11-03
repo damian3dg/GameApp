@@ -1,7 +1,6 @@
 package com.example.gameapp.data
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
@@ -21,16 +20,16 @@ class GamesDataSource(private val repo: GamesRepository, private val layout:Stri
     override suspend fun load(params: PagingSource.LoadParams<Int>): PagingSource.LoadResult<Int, GameList> {
         return try {
             val nextPageNumber = params.key ?: 1
-            Log.d("entro","entro")
+
             val response:GamesModel
 
             when (layout) {
                 "popularGames" -> response = repo.getGamesPaging(nextPageNumber, 7)
                 "currentWeek" -> response = repo.getGamesByDate(nextPageNumber, 7,getCurrentWeekDates())
-                else -> response = repo.getSearchGames(nextPageNumber, 5,layout)
+                else -> response = repo.getSearchGames(nextPageNumber, 7,layout)
             }
 
-            Log.d("response",response.results.toString())
+
             LoadResult.Page(
                 //data seria el dato recibido....
                 data = response.results,

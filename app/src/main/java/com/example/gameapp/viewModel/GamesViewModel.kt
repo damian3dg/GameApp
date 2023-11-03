@@ -1,6 +1,7 @@
 package com.example.gameapp.viewModel
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -18,6 +19,8 @@ import com.example.gameapp.repository.GamesRepository
 import com.example.gameapp.state.GameState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,6 +32,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GamesViewModel @Inject constructor(private val repo: GamesRepository) : ViewModel() {
+
+    private val _errorConnection = MutableStateFlow(false)
+    val errorConnection: StateFlow<Boolean> = _errorConnection.asStateFlow()
 
     //Que son los mutablestateflow
     private val _games = MutableStateFlow<List<GameList>>(emptyList())
@@ -42,25 +48,50 @@ class GamesViewModel @Inject constructor(private val repo: GamesRepository) : Vi
     var state by mutableStateOf(GameState())
         private set
 
-
-    private var searchGames: Flow<PagingData<GameList>>? = null
+    private val searchGames: Flow<PagingData<GameList>>? = null
     var searchGamesNonNull: Flow<PagingData<GameList>> = searchGames ?: emptyFlow()
+
+    //private var _popularGames: Flow<PagingData<GameList>>? = null
+    var popularGames: Flow<PagingData<GameList>> = emptyFlow()
+
+    //private var _currentGamesWeek: Flow<PagingData<GameList>>? = null
+    var currentGamesWeek: Flow<PagingData<GameList>> = emptyFlow()
+
+    private val _searchResults = MutableStateFlow<List<GameList>>(emptyList())
+    val searchResults: StateFlow<List<GameList>> = _searchResults
+
+    private var searchJob: Job? = null
 
 
     init {
         fetchTopGames()
+        fetchListGame()
     }
 
-    var  popularGames  = Pager(PagingConfig(pageSize = 5)){
-        GamesDataSource(repo,"popularGames")
-    }.flow.cachedIn(viewModelScope)
-        private set
 
-    var  currentGamesWeek  = Pager(PagingConfig(pageSize = 5)){
-        GamesDataSource(repo,"currentWeek")
-    }.flow.cachedIn(viewModelScope)
-        private set
+    fun fetchListGame() {
 
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    popularGames = Pager(PagingConfig(pageSize = 5)) {
+                        GamesDataSource(repo, "popularGames")
+                    }.flow.cachedIn(viewModelScope)
+
+                    currentGamesWeek = Pager(PagingConfig(pageSize = 5)) {
+                        GamesDataSource(repo, "currentWeek")
+                    }.flow.cachedIn(viewModelScope)
+
+                    _errorConnection.value = false
+                } catch (e: Exception) {
+                    _errorConnection.value = true
+                }
+
+            }
+        }
+
+
+    }
 
 //    private fun fetchGames() {
 //
@@ -76,14 +107,36 @@ class GamesViewModel @Inject constructor(private val repo: GamesRepository) : Vi
 //        }
 //    }
 
+    fun clearSearchListgames() {
+        _searchResults.value = emptyList()
+    }
 
-     fun fetchSearchGames(name:String) {
+    fun searchListGames(name: String) {
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            delay(400)
+            withContext(Dispatchers.IO) {
+                try {
+                    if (name.isNotEmpty()) {
 
-         searchGamesNonNull  = Pager(PagingConfig(pageSize = 5)){
-             GamesDataSource(repo,name)
-         }.flow.cachedIn(viewModelScope)
+                        val result = repo.getSearchGames(1, 15, reemplazarEspaciosConGuionesBajos(name))
 
+                        _searchResults.value = result.results
+                    } else {
+                        _searchResults.value = emptyList()
+                    }
+                } catch (e: Exception) {
+                    Log.d("lista view", e.toString())
+                }
+            }
+        }
+    }
 
+    fun fetchSearchGames(name: String) {
+
+        searchGamesNonNull = Pager(PagingConfig(pageSize = 5)) {
+            GamesDataSource(repo, name)
+        }.flow.cachedIn(viewModelScope)
 
 
 //         _isLoading.value = true
@@ -112,13 +165,14 @@ class GamesViewModel @Inject constructor(private val repo: GamesRepository) : Vi
 //
 //        }
     }
-//Parametro que estamos enviando de una vista a otra. Por que se pasa a otra clase lo que recibimos?
-@SuppressLint("SuspiciousIndentation")
-fun getGameById(id:Int){
-    _isLoading.value = true
+
+    //Parametro que estamos enviando de una vista a otra. Por que se pasa a otra clase lo que recibimos?
+    @SuppressLint("SuspiciousIndentation")
+    fun getGameById(id: Int) {
+        _isLoading.value = true
 //    fetchScreenshotsForGame(id.toString())
         viewModelScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
 
                 try {
                     // Realizar la carga de datos
@@ -128,13 +182,13 @@ fun getGameById(id:Int){
                         description_raw = result?.description_raw ?: "",
                         metacritic = result?.metacritic ?: 0,
                         background_image = result?.background_image ?: "",
-                        website = result?.website?: "sin web",
-                        released = result?.released?: "no avaible",
-                        platforms = result?.platforms?: emptyList<PlatformsItems>(),
-                        genres = result?.genres?: emptyList(),
-                        rating = result?.rating?: ""
+                        website = result?.website ?: "sin web",
+                        released = result?.released ?: "no avaible",
+                        platforms = result?.platforms ?: emptyList<PlatformsItems>(),
+                        genres = result?.genres ?: emptyList(),
+                        rating = result?.rating ?: ""
 
-                        )
+                    )
                 } catch (e: Exception) {
                     // Manejar errores si es necesario
                 } finally {
@@ -147,43 +201,49 @@ fun getGameById(id:Int){
     }
 
 
-
-
-
-
-        fun fetchScreenshotsForGame(gamePk: String) {
-            _isLoading.value = true
-            viewModelScope.launch {
-                withContext(Dispatchers.IO) {
-            val screenshotsList = repo.getScreenshotsForGame(gamePk)
-            if (screenshotsList != null) {
-                _screenshots.value = screenshotsList
-            }
-        }
-                }
-            }
-
-    fun fetchTopGames() {
+    fun fetchScreenshotsForGame(gamePk: String) {
         _isLoading.value = true
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val games = repo.getTopGames()
-                if (games != null) {
-                    _games.value = games
+                val screenshotsList = repo.getScreenshotsForGame(gamePk)
+                if (screenshotsList != null) {
+                    _screenshots.value = screenshotsList
                 }
             }
         }
     }
 
-    fun clean(){
+    fun fetchTopGames() {
+        _isLoading.value = true
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val games = repo.getTopGames()
+                    if (games != null) {
+                        _games.value = games
+                        _errorConnection.value = false
+                    }
+
+                } catch (e: Exception) {
+                    _errorConnection.value = true
+                }
+            }
+        }
+    }
+
+    fun clean() {
         state = state.copy(
-            name =  "",
-            description_raw =  "",
+            name = "",
+            description_raw = "",
             metacritic = 0,
-            background_image =  "",
+            background_image = "",
             website = "",
 
-        )
+            )
+
+
+        _screenshots.value = emptyList()
+
     }
 
     fun reemplazarEspaciosConGuionesBajos(texto: String): String {

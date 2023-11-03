@@ -1,13 +1,17 @@
 package com.example.gameapp.components
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +21,6 @@ import androidx.compose.foundation.layout.Column
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,19 +29,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -47,11 +49,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,18 +62,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -87,12 +84,10 @@ import coil.request.ImageRequest
 import com.example.gameapp.R
 import com.example.gameapp.model.GameList
 import com.example.gameapp.model.Genres
-import com.example.gameapp.model.Platform
 import com.example.gameapp.model.PlatformsItems
 import com.example.gameapp.util.Constants.Companion.CUSTOM_BLACK
 import com.example.gameapp.util.Constants.Companion.CUSTOM_GREEN
-import org.w3c.dom.Text
-import kotlin.math.absoluteValue
+import okhttp3.internal.wait
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -144,12 +139,12 @@ fun MainTopBar(
 fun CardGameCurrentWeek(game: GameList, from: String = "", onClick: () -> Unit) {
 
     Card(
-        shape = RoundedCornerShape(20.dp),
+
         modifier = Modifier
-            .padding(10.dp)
+
             .shadow(40.dp)
             .width(120.dp)
-            .height(120.dp)
+
             .clickable { onClick() },
 
         ) {
@@ -162,29 +157,21 @@ fun CardGameCurrentWeek(game: GameList, from: String = "", onClick: () -> Unit) 
             }
 
             // Texto en la esquina inferior derecha
-            Text(
-                text = game.released,
-                color = Color.White,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd) // Alinea el texto en la esquina inferior derecha
-                    .padding(4.dp)
-            )
+
         }
     }
 }
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun CardGamePopular(game: GameList, from: String = "", onClick: () -> Unit) {
 
     Card(
-        shape = RoundedCornerShape(20.dp),
+
         modifier = Modifier
             .padding(10.dp)
-            .shadow(40.dp)
-            .width(180.dp)
-            .height(180.dp)
+            .width(160.dp)
+            .height(170.dp)
             .clickable { onClick() },
 
         ) {
@@ -196,11 +183,13 @@ fun CardGamePopular(game: GameList, from: String = "", onClick: () -> Unit) {
                 MainImage(image = "")
             }
 
-            // Texto en la esquina inferior derecha
-            Box(
+            if (game.metacritic.toString() != "0") Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd) // Alinea el cuadradito en la esquina superior izquierda
-                    .background(Color.Green) // Color del cuadradito
+                    .background(
+                        color = Color.Black.copy(alpha = 0.2f), // Establece el color de fondo con transparencia
+                        shape = CircleShape
+                    ) // Aplica una forma circular
                     .padding(4.dp), // Espaciado interno del cuadradito
                 contentAlignment = Alignment.Center
             ) {
@@ -226,8 +215,7 @@ fun ImageDetail(image: String, navController: NavController) {
         // Imagen principal
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current).data(imagenModificada)
-                .crossfade(true)
-                .build(),
+                .crossfade(true).build(),
             contentDescription = "Image",
             modifier = Modifier
                 .fillMaxWidth()
@@ -343,10 +331,7 @@ fun Title(name: String, rating: String) {
 
 @Composable
 fun MetaWebSite(
-    url: String,
-    release: String,
-    item: List<PlatformsItems>,
-    itemGenres: List<Genres>
+    url: String, release: String, item: List<PlatformsItems>, itemGenres: List<Genres>
 ) {
     Log.d("release", release)
     val context = LocalContext.current
@@ -389,15 +374,14 @@ fun MetaWebSite(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TopGames(games: List<GameList>, pad: PaddingValues) {
+fun TopGames(games: List<GameList>, pad: PaddingValues, navController: NavController) {
 
     val pageCount = games.count()
 
     val density = LocalDensity.current
     val context = LocalContext.current
     val pagerState = rememberPagerState(
-        initialPage = 0,
-        initialPageOffsetFraction = 0f
+        initialPage = 0, initialPageOffsetFraction = 0f
     ) {
         games.count()
     }
@@ -406,7 +390,7 @@ fun TopGames(games: List<GameList>, pad: PaddingValues) {
     Box(
         Modifier
             .fillMaxWidth()
-            .height(300.dp)
+            .height(330.dp)
             .padding(pad)
     ) {
 
@@ -417,46 +401,66 @@ fun TopGames(games: List<GameList>, pad: PaddingValues) {
                 state = pagerState,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp)
-                    .height(190.dp),
-
+                    .padding(top = 5.dp)
+                    .height(230.dp),
                 beyondBoundsPageCount = 2,
                 //.background(Color.Red),
 
                 pageSpacing = 15.dp,
-                contentPadding = PaddingValues(horizontal = 50.dp),
-                pageSize = PageSize.Fixed(290.dp)
+                // contentPadding = PaddingValues(horizontal = 10.dp),
+                //pageSize = PageSize.Fixed(290.dp)
             ) { page ->
                 val game = games[page]
                 val imagenModificada =
                     game.background_image.replace("/media/", "/media/resize/420/-/")
                 val request: ImageRequest
                 with(density) {
-                    request = ImageRequest.Builder(context)
-                        .data(imagenModificada)
-                        .crossfade(enable = true)
-                        .build()
+                    request = ImageRequest.Builder(context).data(imagenModificada)
+                        .crossfade(enable = true).build()
                     context.imageLoader.enqueue(request)
                 }
-                Card {
-                    RoundedCornerShape(10.dp)
+                Card(modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        navController.navigate("DetailView/${game.id}")
 
+                    }) {
 
+                    Box {
 
-                    AsyncImage(
-                        model = request,
-                        contentDescription = "default crossfade example",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(190.dp)
-                            .clip(RoundedCornerShape(10.dp)),
-                        contentScale = ContentScale.Crop,
+                        AsyncImage(
+                            model = request,
+                            contentDescription = "default crossfade example",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(230.dp),
 
-
+                            contentScale = ContentScale.Crop,
                         )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .align(Alignment.BottomStart)
+                        ) {
+                            Text(
+                                text = game.name,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                            )
+                        }
+
+                        // Puedes usar Spacer para ajustar la posición del Text
+                        Spacer(modifier = Modifier.width(16.dp))
+                    }
+
                 }
+
             }
         }
+
+
 
 
         Row(
@@ -468,7 +472,7 @@ fun TopGames(games: List<GameList>, pad: PaddingValues) {
         ) {
             repeat(pageCount) { iteration ->
                 val color =
-                    if (pagerState.currentPage == iteration) Color.Yellow else Color.LightGray
+                    if (pagerState.currentPage == iteration) Color.White else Color.LightGray
                 Box(
                     modifier = Modifier
                         .padding(3.dp)
@@ -522,21 +526,33 @@ fun Loader() {
 
 }
 
+
 @Composable
 
 fun PopularGames(
     popularGames: LazyPagingItems<GameList>, navController: NavController
 ) {
     Column(
-        modifier = Modifier
+        modifier = Modifier.wrapContentSize()
 
-            .height(250.dp)
     ) {
-        Row() {
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             Text(
                 text = "Popular",
                 fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier.padding(5.dp)
+            )
+            Text(
+                text = "View all",
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier
+                    .padding(5.dp)
+                    .clickable {
+                        navController.navigate("PopularGames")
+                    }
             )
         }
         LazyRow(
@@ -547,12 +563,18 @@ fun PopularGames(
                 val item = popularGames[index]
                 if (item != null) {
 
-                    Column(Modifier.width(180.dp)) {
+                    Column(
+                        Modifier
+                            .width(180.dp)
+                            //.height(260.dp)
+                            .wrapContentSize()
+                    ) {
                         CardGamePopular(item) {
                             navController.navigate("DetailView/${item.id}")
                         }
 
                         Text(
+
                             text = item.name,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.White,
@@ -594,37 +616,78 @@ fun PopularGames(
 
 @Composable
 
-fun CurrentWeek(curretWeek: LazyPagingItems<GameList>, navController: NavController, pad: Dp) {
+fun ComingSoon(curretWeek: LazyPagingItems<GameList>, navController: NavController, pad: Dp) {
     Column(
-        modifier = Modifier.padding(pad)
+        modifier = Modifier
+            .padding(pad)
+            .height(450.dp)
     ) {
         Row() {
             Text(
-                text = "Current released Week",
+                text = "Cooming Soon",
                 fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier.padding(5.dp)
             )
         }
-        LazyRow(
+
+
+        LazyColumn(
 //            horizontalAlignment = Alignment.CenterHorizontally
 
         ) {
             items(curretWeek.itemCount) { index ->
                 val item = curretWeek[index]
                 if (item != null) {
+                    Card(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(120.dp)
+                            .padding(15.dp)
+                            .clickable {
+                                navController.navigate("DetailView/${item.id}")
 
-                    Column(Modifier.width(150.dp)) {
-                        CardGameCurrentWeek(item) {
-                            navController.navigate("DetailView/${item.id}")
+                            }
+
+
+                    ) {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(350.dp)
+                                .background(Color(0xFF171513))
+                        ) {
+                            CardGameCurrentWeek(item) {
+
+                                navController.navigate("DetailView/${item.id}")
+
+
+                            }
+                            Column(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.CenterVertically),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+
+                                ) {
+                                Text(
+                                    text = item.name,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+
+                                    fontSize = 15.sp
+                                )
+                                Text(
+                                    text = item.released,
+                                    color = Color.White,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+
+                                    )
+                            }
+
                         }
-                        Text(
-                            text = item.name,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color.White,
-                            modifier = Modifier.padding(start = 10.dp),
-                            fontSize = 12.sp
-                        )
                     }
+
 
                 }
 
@@ -649,7 +712,7 @@ fun CurrentWeek(curretWeek: LazyPagingItems<GameList>, navController: NavControl
 
                 is LoadState.Error -> {
                     item {
-                        Text(text = "Error")
+                        //        Text(text = "Error")
                     }
                 }
             }
@@ -666,19 +729,19 @@ fun TextDescription(text: String) {
 
 // Creating a long text
 
-    Column(modifier = Modifier.padding(20.dp)) {
-
+    Column(modifier = Modifier.padding(15.dp)) {
+        Text(text = "Description:", fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(5.dp))
         Column(modifier = Modifier
             .animateContentSize(animationSpec = tween(300))
             .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
+                interactionSource = remember { MutableInteractionSource() }, indication = null
             ) { showMore = !showMore }) {
 
             if (showMore) {
-                Text(text = text)
+                Text(text = text, fontSize = 14.sp)
             } else {
-                Text(text = text, maxLines = 3, overflow = TextOverflow.Ellipsis)
+                Text(text = text, maxLines = 3, overflow = TextOverflow.Ellipsis, fontSize = 14.sp)
             }
         }
 
@@ -688,7 +751,7 @@ fun TextDescription(text: String) {
 @Composable
 fun PlatformList(item: List<PlatformsItems>, itemGenres: List<Genres>, website: String) {
     //Creo una lista de nombres de plataforma
-    Log.d("genres", itemGenres.toString())
+
     val platformNames = item.map { it.platform.name }
     val listItemGenres = itemGenres.map { it.name }
 
@@ -697,13 +760,17 @@ fun PlatformList(item: List<PlatformsItems>, itemGenres: List<Genres>, website: 
 
     Column(Modifier.padding(15.dp)) {
         Text(text = "Platforms:", fontWeight = FontWeight.Bold)
-        Text(text = commaSeparatedNames)
-        Spacer(modifier = Modifier.height(15.dp))
+        Text(text = commaSeparatedNames, fontSize = 14.sp)
+
+        Spacer(Modifier.height(15.dp))
+
         Text(text = "Genres:", fontWeight = FontWeight.Bold)
-        Text(text = commaSeparaGenres)
-        Spacer(modifier = Modifier.height(15.dp))
+        Text(text = commaSeparaGenres, fontSize = 14.sp)
+
+        Spacer(Modifier.height(15.dp))
+
         Text(text = "Website:", fontWeight = FontWeight.Bold)
-        Text(text = website)
+        Text(text = website, fontSize = 14.sp)
     }
 
 }

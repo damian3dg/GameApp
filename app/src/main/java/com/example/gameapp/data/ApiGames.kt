@@ -34,7 +34,7 @@ interface ApiGames {
 
     @GET(ENDPOINT + API_KEY)
     suspend fun getListGamesByName(
-        @Query("page") page: Int,
+        @Query("page") page: Int ,
         @Query("page_size") pageSize: Int,
         @Query(value = "search") search: String,
         @Query("ordering") ordering: String,

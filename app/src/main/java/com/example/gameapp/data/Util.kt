@@ -12,7 +12,7 @@ fun getCurrentWeekDates(): String {
         val now = LocalDate.now()
         val dayOfWeek = now.dayOfWeek
         val startDate = now.minusDays(dayOfWeek.value.toLong() - 1)
-        val endDate = startDate.plusDays(6)
+        val endDate = startDate.plusDays(12)
 
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val formattedStartDate = startDate.format(formatter)

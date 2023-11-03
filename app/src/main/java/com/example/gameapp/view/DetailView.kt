@@ -66,17 +66,14 @@ fun DetailView(viewModel: GamesViewModel, navController: NavController, id: Int)
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.fetchScreenshotsForGame(id.toString())
-
-    }
-
-    LaunchedEffect(Unit) {
         viewModel.getGameById(id)
-
     }
+
 
     DisposableEffect(Unit) {
         onDispose {
             viewModel.clean()
+
         }
     }
 //
@@ -140,22 +137,22 @@ fun ContentDetailView(viewModel: GamesViewModel, id: Int,navController: NavContr
             .fillMaxWidth()
             .padding(top = 215.dp)
             .clip(RoundedCornerShape(topStart = 35.dp, topEnd = 35.dp)) // Redondea la parte superior
-            .background(Color(CUSTOM_BLACK))
+            .background(Color(0xFF1B1919))
 
     ) {
         Spacer(modifier = Modifier.height(15.dp))
         Title(state.name,state.rating)
-        Row(
-            //El spaceBetween los separa uno a la izq y el otro a la derecha
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(15.dp)
-        ) {
-
-            MetaWebSite(state.website, state.released,state.platforms,state.genres)
-            ReviewCard(metascore = (state.metacritic))
-        }
+//        Row(
+//            //El spaceBetween los separa uno a la izq y el otro a la derecha
+//            horizontalArrangement = Arrangement.SpaceBetween,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(15.dp)
+//        ) {
+//
+//            MetaWebSite(state.website, state.released,state.platforms,state.genres)
+//            ReviewCard(metascore = (state.metacritic))
+//        }
 
 
         TextDescription(state.description_raw)
@@ -187,8 +184,7 @@ fun ScreenshotsView(gamePk: String, screenshots: List<ScreenShot>) {
     Box(
         Modifier
             .fillMaxWidth()
-            .height(200.dp),
-
+            .height(220.dp),
         ) {
 
         if (screenshots.isNotEmpty()) {
@@ -198,7 +194,6 @@ fun ScreenshotsView(gamePk: String, screenshots: List<ScreenShot>) {
                 state = pagerState,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp)
                     .height(200.dp),
 
                 beyondBoundsPageCount = 2,
@@ -229,22 +224,20 @@ fun ScreenshotsView(gamePk: String, screenshots: List<ScreenShot>) {
                             .height(170.dp)
                             .clip(RoundedCornerShape(10.dp)),
                         contentScale = ContentScale.Crop,
-
-
                         )
                 }
             }
 
             Row(
                 Modifier
-                    .height(50.dp)
+                    .height(60.dp)
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter),
                 horizontalArrangement = Arrangement.Center
             ) {
                 repeat(pageCount) { iteration ->
                     val color =
-                        if (pagerState.currentPage == iteration) Color.Yellow else Color.LightGray
+                        if (pagerState.currentPage == iteration) Color.White else Color.LightGray
                     Box(
                         modifier = Modifier
                             .padding(3.dp)
@@ -254,7 +247,6 @@ fun ScreenshotsView(gamePk: String, screenshots: List<ScreenShot>) {
 
                     )
                 }
-
 
             }
         }
