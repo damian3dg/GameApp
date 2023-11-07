@@ -18,9 +18,9 @@ import androidx.core.view.WindowCompat
 import com.example.gameapp.util.Constants.Companion.CUSTOM_BLACK
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = Color.Black,
+    secondary = Color.Black,
+    tertiary = Color.Black
 )
 
 private val LightColorScheme = lightColorScheme(

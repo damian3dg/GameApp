@@ -11,12 +11,13 @@ import com.example.gameapp.view.GameSearching
 import com.example.gameapp.view.GamesPopular
 import com.example.gameapp.view.HomeView
 import com.example.gameapp.view.SearchGameView
+import com.example.gameapp.view.SplashScreen
 import com.example.gameapp.viewModel.GamesViewModel
 
 @Composable
 fun NavManager(viewModel: GamesViewModel) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "Home") {
+    NavHost(navController = navController, startDestination = "SplashScreen") {
         composable("Home") {
             HomeView(viewModel, navController)
         }
@@ -34,6 +35,9 @@ fun NavManager(viewModel: GamesViewModel) {
         }
         composable("PopularGames"){
             GamesPopular(viewModel,navController)
+        }
+        composable("SplashScreen"){
+            SplashScreen(viewModel,navController)
         }
     }
 }

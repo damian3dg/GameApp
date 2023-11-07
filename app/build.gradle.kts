@@ -87,6 +87,8 @@ dependencies {
 // Coil
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.10")
+// Lottie
+    implementation("com.airbnb.android:lottie-compose:6.0.1")
 
 //Paging
     implementation("androidx.paging:paging-runtime:3.1.1")
